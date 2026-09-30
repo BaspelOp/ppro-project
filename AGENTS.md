@@ -96,3 +96,13 @@ Během semestru vystupuje vyučující (Dominik Palla) v roli klienta a ověřuj
 - **Ověřování spuštěním:** Odpověď *"to už mám hotové"* je platná pouze tehdy, když ji lze ihned demonstrovat v běžící aplikaci.
 - **Argumentace omezení:** Odpověď *"to nejde"* je legitimní, pokud je podložena technickým či doménovým zdůvodněním zapsaným v dokumentaci.
 - Jakákoliv změna schválená či požadovaná klientem se neprodleně zapíše do [README.md](file:///p:/ppro/project/README.md) v sekci *Rozhodnutí*.
+
+---
+
+## 6. Krokování featur a sledování postupu (TODO.md)
+
+- Pro detailní řízení implementace a sledování postupu slouží soubor [TODO.md](file:///p:/ppro/project/TODO.md).
+- Asistent při implementaci postupuje systematicky krok za krokem:
+  - Před zahájením práce na featuře označí úkol stavem `[/]` (rozpracováno).
+  - Po dokončení a otestování označí úkol stavem `[x]` (hotovo).
+- [TODO.md](file:///p:/ppro/project/TODO.md) je udržován aktuální společně s [README.md](file:///p:/ppro/project/README.md) při každém milníku a commitu.

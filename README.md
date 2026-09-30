@@ -32,7 +32,7 @@ Aplikace musí splňovat následující kritéria definovaná zadáním:
 > [!IMPORTANT]
 > Volbu konkrétního zadání je nutné potvrdit **nejpozději na 4. cvičení** společně s návrhem datového modelu.
 
-Níže je přehled 4 klientských zadání ze zadání předmětu. Označte vybranou variantu `[x]`:
+Níže je přehled 4 klientských zadání ze zadání předmětu:
 
 - [ ] **Zadání A: Rezervace v ordinaci** *(MUDr. Jana Hrubá, Ordinace Na Vyhlídce)*  
   *Kde se láme návrh:* Překrývání termínů a význam zrušené rezervace.
@@ -40,8 +40,10 @@ Níže je přehled 4 klientských zadání ze zadání předmětu. Označte vybr
   *Kde se láme návrh:* Okamžik odečtení zásoby a dohledatelnost pohybů.
 - [ ] **Zadání C: Kurzy vzdělávacího centra** *(Ing. Lucie Bartošová, Akademie Trutnov)*  
   *Kde se láme návrh:* Pořadník a pravidlo dokončení kurzu.
-- [ ] **Zadání D: Půjčovna vybavení** *(Martin Řehák, Hory a voda)*  
-  *Kde se láme návrh:* Rezervace konkrétního kusu proti rezervaci typu.
+- [x] **Zadání D: Půjčovna vybavení** *(Martin Řehák, Hory a voda)* – **ZVOLENO PRO IMPLEMENTACI**  
+  *Kde se láme návrh:* Rezervace konkrétního kusu proti rezervaci typu.  
+  *Technologický stack:* **React 18 + Vite + TypeScript (UI)** + **Python FastAPI (Backend)** + **PostgreSQL 16 (Docker)**  
+  *Průběžný seznam úkolů:* [TODO.md](file:///p:/ppro/project/TODO.md)
 
 ---
 
@@ -275,6 +277,8 @@ Aplikace bude následně dostupná na příslušném portu (bude specifikován p
 
 - **2026-09-30:**
   - Inicializace Git repozitáře a napojení na GitHub (`BaspelOp/ppro-project`).
-  - Vytvoření [AGENTS.md](file:///p:/ppro/project/AGENTS.md) s pravidly pro asistenta (zásady commitů s `-m`, explicitní push, SSOT dokumentace).
+  - Vytvoření [AGENTS.md](file:///p:/ppro/project/AGENTS.md) s pravidly pro asistenta (zásady commitů s `-m`, explicitní push, SSOT dokumentace, krokování úkolů).
   - Vytvoření [README.md](file:///p:/ppro/project/README.md) jako jediného zdroje pravdy pro zadání, pravidla PPRO a seznam rozhodnutí.
   - Nastavení pre-commit hooku pro kontrolu aktuálnosti technické dokumentace.
+  - Výběr Zadání D (Půjčovna vybavení „Hory a voda“) a technologického stacku (React + TypeScript + FastAPI + PostgreSQL).
+  - Vytvoření [TODO.md](file:///p:/ppro/project/TODO.md) pro krokování a odškrtávání jednotlivých fází a featur.
