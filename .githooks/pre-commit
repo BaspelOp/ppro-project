@@ -1,0 +1,23 @@
+#!/bin/sh
+# Git Pre-commit Hook: Ověření aktuálnosti technické dokumentace (README.md)
+
+echo "================================================================"
+echo " [PPRO Pre-commit Hook] Kontrola technické dokumentace (SSOT)"
+echo "================================================================"
+
+STAGED_FILES=$(git diff --cached --name-only)
+
+# Kontrola, zda je README.md součástí commitu
+if echo "$STAGED_FILES" | grep -q "^README\.md$"; then
+    echo " -> [OK] README.md je součástí commitu (dokumentace aktualizována)."
+else
+    echo " -> [POZOR] Tento commit neobsahuje změny v README.md!"
+    echo " -> Připomenutí: README.md je jediným zdrojem pravdy projektu PPRO."
+    echo "    Před commitem ověřte, zda není potřeba zapsat:"
+    echo "    1) Rozhodnutí k otevřeným bodům klienta"
+    echo "    2) Změny v architektuře, vrstvách či datovém modelu"
+    echo "    3) Záznam o postupu v sekci Deník vývoje (Changelog)"
+fi
+
+echo "================================================================"
+exit 0
