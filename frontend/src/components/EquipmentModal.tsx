@@ -311,7 +311,7 @@ export const EquipmentModal: React.FC<EquipmentModalProps> = ({
             <button
               type="button"
               id="btn-cancel-equipment"
-              className="btn btn-secondary"
+              className="tactile-btn"
               onClick={onClose}
               disabled={isSubmitting}
             >
@@ -320,10 +320,10 @@ export const EquipmentModal: React.FC<EquipmentModalProps> = ({
             <button
               type="submit"
               id="btn-save-equipment"
-              className="btn btn-primary"
+              className="tactile-btn tactile-btn-primary"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Ukládám...' : isEditing ? 'Uložit změny' : 'Zaevidovat kus'}
+              {isSubmitting ? 'Ukládám...' : isEditing ? 'Uložit změny' : '+ Zaevidovat kus'}
             </button>
           </div>
         </form>

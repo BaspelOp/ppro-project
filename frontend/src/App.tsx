@@ -10,8 +10,7 @@ import {
 } from './types/equipment';
 import { equipmentApi } from './services/api';
 import { Header } from './components/Header';
-import { StatsOverview } from './components/StatsOverview';
-import { FilterBar } from './components/FilterBar';
+import { Sidebar } from './components/Sidebar';
 import { EquipmentTable } from './components/EquipmentTable';
 import { EquipmentModal } from './components/EquipmentModal';
 import { ServiceModal } from './components/ServiceModal';
@@ -78,7 +77,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       loadData();
-    }, 200);
+    }, 150);
     return () => clearTimeout(timer);
   }, [loadData]);
 
@@ -104,13 +103,13 @@ export const App: React.FC = () => {
 
   const handleCreateItem = async (data: EquipmentItemCreate) => {
     await equipmentApi.create(data);
-    addToast('success', `Kus ${data.inventory_number} byl úspěšně zaevidován do fondu.`);
+    addToast('success', `Kus ${data.inventory_number} byl zaevidován do manifestu.`);
     await loadData();
   };
 
   const handleUpdateItem = async (id: number, data: EquipmentItemUpdate) => {
     const updated = await equipmentApi.update(id, data);
-    addToast('success', `Položka ${updated.inventory_number} byla upravena.`);
+    addToast('success', `Záznam ${updated.inventory_number} byl aktualizován.`);
     await loadData();
   };
 
@@ -138,54 +137,33 @@ export const App: React.FC = () => {
     Boolean(search.trim()) || selectedCategory !== undefined || selectedStatus !== undefined;
 
   return (
-    <div className="app-layout">
+    <div className="brutalist-app">
       <Header
         onOpenCreateModal={handleOpenCreateModal}
         onRefresh={loadData}
         isLoading={isLoading}
       />
 
-      <main className="main-content">
-        {/* Banner klientské konzultace */}
-        <div className="client-note-banner" id="client-demo-banner">
-          <div className="client-note-content">
-            <span className="client-note-badge">Prototyp k ověření</span>
-            <span className="client-note-text">
-              <strong>Zadání D: Půjčovna vybavení „Hory a voda“</strong> – Evidence položek, ranní přehledový dashboard a servisní odstávky pro konzultaci s klientem.
-            </span>
-          </div>
-          <button
-            className="btn btn-secondary btn-sm"
-            onClick={() => addToast('info', 'Zpětná vazba klienta k designu byla zapracována (teplá béžovo-hnědá paleta, flat styl, vektorové SVG ikony).')}
-          >
-            <InfoIcon size={14} />
-            <span>Záznam rozhodnutí</span>
-          </button>
-        </div>
-
-        {/* Dashboard statistik */}
-        <StatsOverview
+      <main className="dispatch-desk">
+        {/* Levý navigační a filtrovací rail */}
+        <Sidebar
           stats={stats}
-          selectedStatus={selectedStatus}
-          onSelectStatus={setSelectedStatus}
-        />
-
-        {/* Vyhledávání a filtry */}
-        <FilterBar
-          search={search}
-          onSearchChange={setSearch}
           selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
           selectedStatus={selectedStatus}
           onSelectStatus={setSelectedStatus}
-          onResetFilters={handleResetFilters}
-          hasActiveFilters={hasActiveFilters}
         />
 
-        {/* Tabulka a seznam vybavení */}
+        {/* Hlavní manifest tabulka s horním panelem */}
         <EquipmentTable
           items={items}
           isLoading={isLoading}
+          search={search}
+          onSearchChange={setSearch}
+          selectedCategory={selectedCategory}
+          selectedStatus={selectedStatus}
+          onResetFilters={handleResetFilters}
+          hasActiveFilters={hasActiveFilters}
           onEdit={handleOpenEditModal}
           onServiceAction={handleOpenServiceModal}
           onDiscard={handleOpenDiscardModal}
@@ -215,13 +193,13 @@ export const App: React.FC = () => {
         item={discardItem}
       />
 
-      {/* Notifikace Toasty (Flat warm design bez emoji) */}
+      {/* Toast Notifikace */}
       <div className="toast-container" id="toast-container">
         {toasts.map((toast) => (
           <div key={toast.id} className={`toast toast-${toast.type}`}>
-            {toast.type === 'success' && <CheckIcon size={16} color="#22543d" />}
-            {toast.type === 'error' && <AlertIcon size={16} color="#8f2323" />}
-            {toast.type === 'info' && <InfoIcon size={16} color="#8c5836" />}
+            {toast.type === 'success' && <CheckIcon size={14} color="#14532d" />}
+            {toast.type === 'error' && <AlertIcon size={14} color="#991b1b" />}
+            {toast.type === 'info' && <InfoIcon size={14} color="#1a1614" />}
             <span>{toast.message}</span>
           </div>
         ))}

@@ -353,11 +353,16 @@ py -3.12 -m pytest
 ## 7. Deník vývoje (Changelog)
 
 - **2026-10-07:**
-  - **Zpětná vazba klienta k designu (Odmítnutí generického AI vzhledu a emoji):**
-    - Kompletní odstranění emoji napříč celou aplikací (včetně faviconu a kategorií).
-    - Vytvoření knihovny čistých plochých vektorových SVG ikon ([Icons.tsx](file:///p:/ppro/project/frontend/src/components/Icons.tsx)) pro kategorie, akce, stavy i logo půjčovny.
-    - Přechod na teplou přírodní paletu odpovídající outdoorové a vodácké/horské půjčovně (teplý béžový pergamen `#f8f5ee`, písek `#f1ebd9`, kávová hnědá `#5a3821`, terakota `#8c5836` a lesní zeleň `#22543d`).
-    - Plochý (flat) styl s papírovou hloubkou, zřetelnými rámečky a vyšším kontrastem pro ranní víkendovou špičku obsluhy.
+  - **Reakce na zpětnou vazbu klienta (Přepracování wireframu a stylu na Minimalistický Neo-Brutalismus):**
+    - Klient odmítl generický layout plovoucích SaaS karet s požadavkem na svébytný wireframe a styl minimalismu spojeného s brutalismem.
+    - **Nový wireframe (Split Dispatch Desk):**
+      - Asymetrické rozdělení na levý navigační panel ([Sidebar.tsx](file:///p:/ppro/project/frontend/src/components/Sidebar.tsx)) s přímým přepínáním stavů fondu a kategorií s počty v hranatých závorkách `[05]` a pravý hlavní manifest.
+      - Horní dispečerská lišta s integrovaným vyhledáváním a telemetrickými údaji přímo nad inventární tabulkou namísto generického pruhu filtrů.
+    - **Vizuální styl Minimalistický Neo-Brutalismus:**
+      - Zřetelné masivní linky (`border: 2px solid #1a1614`), ostré pravé úhly bez bublinkových zaoblení.
+      - Mechanický haptický efekt tlačítek a známek s tvrdým odsazeným stínem (`box-shadow: 2px 2px 0px #1a1614` / `3px 3px 0px #1a1614`) a fyzickým stiskem při kliknutí.
+      - Písmo `JetBrains Mono` pro inventární kódy `[SKI-001]`, ceny a technická data kombinované se strukturovanou sans-serif typografií.
+      - Přirozený teplý tón surového papíru a kartonu (`#f4efe6`, `#e8dfd1`) v kombinaci s tiskařskou černí a akcenty terakoty, okru a lesního mechu.
   - **FÁZE 1 – Implementace klientského MVP prototypu (Zadání D: Půjčovna vybavení „Hory a voda“):**
     - Vytvoření 3-vrstvé architektury se striktně jednosměrnými závislostmi.
     - **Datová vrstva:** SQLAlchemy model `EquipmentItem`, migrační skript Alembic `001_initial_equipment.py`, `EquipmentRepository` pro CRUD a filtrování.

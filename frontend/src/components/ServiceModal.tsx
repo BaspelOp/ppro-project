@@ -159,7 +159,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
             <button
               type="button"
               id="btn-cancel-service"
-              className="btn btn-secondary"
+              className="tactile-btn"
               onClick={onClose}
               disabled={isSubmitting}
             >
@@ -168,14 +168,14 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
             <button
               type="submit"
               id="btn-confirm-service"
-              className={`btn ${isGoingToService ? 'btn-amber' : 'btn-emerald'}`}
+              className={`tactile-btn ${isGoingToService ? 'tactile-btn-ochre' : 'tactile-btn-forest'}`}
               disabled={isSubmitting}
             >
               {isSubmitting
                 ? 'Zpracovávám...'
                 : isGoingToService
                 ? 'Potvrdit odstávku do servisu'
-                : 'Vrátit do provozu'}
+                : 'Vrátit do fondu'}
             </button>
           </div>
         </form>

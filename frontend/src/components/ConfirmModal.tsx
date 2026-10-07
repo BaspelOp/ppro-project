@@ -97,7 +97,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
           <button
             type="button"
             id="btn-cancel-discard"
-            className="btn btn-secondary"
+            className="tactile-btn"
             onClick={onClose}
             disabled={isSubmitting}
           >
@@ -106,7 +106,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
           <button
             type="button"
             id="btn-confirm-discard"
-            className="btn btn-danger"
+            className="tactile-btn tactile-btn-danger"
             onClick={handleConfirm}
             disabled={isSubmitting}
           >
