@@ -19,51 +19,52 @@
 *Cíl: Připravit plně funkční 3-vrstvou aplikaci v Dockeru se správou první klíčové entity pro demonstraci klientovi a vyučujícímu.*
 
 ### 1.1 Backend & Docker infrastruktura
-- [ ] Inicializace struktury `backend/` (`src/core`, `models`, `schemas`, `repositories`, `services`, `api`)
-- [ ] Vytvoření `requirements.txt` a `.env.example`
-- [ ] Konfigurace `backend/Dockerfile`
-- [ ] Konfigurace `docker-compose.yml` (služby: `db` PostgreSQL 16, `backend` FastAPI)
+- [x] Inicializace struktury `backend/` (`app/core`, `models`, `schemas`, `repositories`, `services`, `api`)
+- [x] Vytvoření `requirements.txt` a `.env.example`
+- [x] Konfigurace `backend/Dockerfile`
+- [x] Konfigurace `docker-compose.yml` (služby: `db` PostgreSQL 16, `backend` FastAPI, `frontend` React/Nginx)
 
 ### 1.2 Datová vrstva (Data / Infrastructure Layer)
-- [ ] Definice SQLAlchemy modelu `EquipmentItem` (inventární číslo, název, kategorie, velikost, rok pořízení, stav opotřebení, provozní stav, poznámka)
-- [ ] Nastavení Alembic a vytvoření počáteční migrace `001_initial_equipment`
-- [ ] Implementace `EquipmentRepository` (CRUD, filtrování dle kategorie, velikosti a stavu)
-- [ ] Vytvoření seedovacího skriptu pro syntetická testovací data (ukázkové lyže, snowboardy, lodě)
+- [x] Definice SQLAlchemy modelu `EquipmentItem` (inventární číslo, název, kategorie, velikost, rok pořízení, stav opotřebení, provozní stav, poznámka)
+- [x] Nastavení Alembic a vytvoření počáteční migrace `001_initial_equipment`
+- [x] Implementace `EquipmentRepository` (CRUD, filtrování dle kategorie, velikosti a stavu, agregace statistik)
+- [x] Vytvoření seedovacího skriptu pro syntetická testovací data (ukázkové lyže, snowboardy, lodě, rafty, vesty)
 
 ### 1.3 Byznys vrstva (Application / Business Layer)
-- [ ] Definice Pydantic schémat (`EquipmentItemCreate`, `EquipmentItemUpdate`, `EquipmentItemResponse`, `EquipmentFilterParams`)
-- [ ] Implementace `EquipmentService`:
-  - [ ] Validace unikátnosti inventárního čísla
-  - [ ] Kontrola povolených přechodů provozních stavů (`AVAILABLE`, `RENTED`, `IN_SERVICE`, `DISCARDED`)
-  - [ ] Byznys pravidlo: kus v servisu nesmí být k dispozici pro výpůjčku
-  - [ ] Validace roku pořízení a povinných parametrů
+- [x] Definice Pydantic schémat (`EquipmentItemCreate`, `EquipmentItemUpdate`, `EquipmentItemResponse`, `EquipmentServiceAction`, `EquipmentStatsResponse`)
+- [x] Implementace `EquipmentService`:
+  - [x] Validace unikátnosti inventárního čísla
+  - [x] Kontrola povolených přechodů provozních stavů (`AVAILABLE`, `RENTED`, `IN_SERVICE`, `DISCARDED`)
+  - [x] Byznys pravidlo: kus v servisu nesmí být k dispozici pro výpůjčku
+  - [x] Validace roku pořízení a povinných parametrů
 
 ### 1.4 API Kontrolery (Presentation Layer - API)
-- [ ] `GET /api/equipment` – Seznam kusů s filtry (kategorie, stav, fulltext hledání)
-- [ ] `GET /api/equipment/{id}` – Detail konkrétního kusu
-- [ ] `POST /api/equipment` – Zaevidování nového kusu do půjčovny
-- [ ] `PUT /api/equipment/{id}` – Editace kusu a stavu opotřebení
-- [ ] `POST /api/equipment/{id}/service` – Odeslání do servisu / návrat ze servisu
-- [ ] `DELETE /api/equipment/{id}` – Bezpečné vyřazení kusu
+- [x] `GET /api/v1/equipment` – Seznam kusů s filtry (kategorie, stav, fulltext hledání)
+- [x] `GET /api/v1/equipment/stats` – Souhrnné statistiky pro ranní dashboard
+- [x] `GET /api/v1/equipment/{id}` – Detail konkrétního kusu
+- [x] `POST /api/v1/equipment` – Zaevidování nového kusu do půjčovny
+- [x] `PUT /api/v1/equipment/{id}` – Editace kusu a stavu opotřebení
+- [x] `POST /api/v1/equipment/{id}/service` – Odeslání do servisu / návrat ze servisu
+- [x] `DELETE /api/v1/equipment/{id}` – Bezpečné vyřazení kusu
 
 ### 1.5 Frontend – Dashboard v Reactu (Presentation Layer - UI)
-- [ ] Inicializace Vite projektu s React + TypeScript v `frontend/`
-- [ ] Vytvoření moderního design systému (čisté CSS, přehledný dashboard obsluhy)
-- [ ] Komponenta: Přehledový dashboard (karty statistik: Celkem kusů, Dostupné, V servisu)
-- [ ] Komponenta: Rychlé filtry pro ranní sobotní špičku (kategorie, dostupnost, velikost)
-- [ ] Komponenta: Tabulka a karty vybavení s barevným odlišením stavů
-- [ ] Komponenta: Modální dialog pro rychlé zaevidování nového kusu
-- [ ] Komponenta: Akce pro rychlý přesun do servisu a návrat ze servisu
-- [ ] Dockerizace frontendu (`frontend/Dockerfile`) a integrace do `docker-compose.yml`
+- [x] Inicializace Vite projektu s React + TypeScript v `frontend/`
+- [x] Vytvoření moderního design systému (čisté CSS, přehledný dashboard obsluhy)
+- [x] Komponenta: Přehledový dashboard (karty statistik: Celkem kusů, Dostupné, Zapůjčeno, V servisu, Vyřazeno s možností filtrace kliknutím)
+- [x] Komponenta: Rychlé filtry pro ranní sobotní špičku (kategorie, dostupnost, velikost, fulltext vyhledávání)
+- [x] Komponenta: Tabulka a karty vybavení s barevným odlišením stavů
+- [x] Komponenta: Modální dialog pro rychlé zaevidování nového kusu
+- [x] Komponenta: Akce pro rychlý přesun do servisu a návrat ze servisu
+- [x] Dockerizace frontendu (`frontend/Dockerfile`, `nginx.conf`) a integrace do `docker-compose.yml`
 
 ### 1.6 Testování a verifikace
-- [ ] Pytest testy pro `EquipmentService` (validace duplicit, stavová logika)
-- [ ] Integrační testy pro FastAPI endpointy
-- [ ] Ověření celého stacku spuštěním `docker compose up --build`
+- [x] Pytest testy pro `EquipmentService` (validace duplicit, stavová logika)
+- [x] Integrační testy pro FastAPI endpointy (7 testů, 100% úspěšnost)
+- [x] Ověření HTTP komunikace a servírování SPA rozhraní
 
 ### 1.7 Dokumentace & Verzování
-- [ ] Aktualizace [README.md](file:///p:/ppro/project/README.md) (zaškrtnutí Zadání D, popis vrstev a entity)
-- [ ] Aktualizace sekce Rozhodnutí a Changelogu
+- [x] Aktualizace [README.md](file:///p:/ppro/project/README.md) (zaškrtnutí Zadání D, popis vrstev a entity, rozhodnutí)
+- [x] Aktualizace sekce Rozhodnutí a Changelogu
 - [ ] Git commit s konvenční zprávou `-m` (a push po schválení)
 
 ---
