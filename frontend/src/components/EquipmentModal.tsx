@@ -8,6 +8,7 @@ import {
   CATEGORY_LABELS,
   CONDITION_LABELS,
 } from '../types/equipment';
+import { CloseIcon, AlertIcon } from './Icons';
 
 interface EquipmentModalProps {
   isOpen: boolean;
@@ -123,14 +124,15 @@ export const EquipmentModal: React.FC<EquipmentModalProps> = ({
       <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">
-            {isEditing ? `Úprava kusu: ${initialItem?.inventory_number}` : 'Zaevidovat nový kus vybavení'}
+            {isEditing ? `Úprava položky: ${initialItem?.inventory_number}` : 'Zaevidovat nový kus vybavení'}
           </h2>
           <button
             id="btn-modal-close"
             className="modal-close-btn"
             onClick={onClose}
+            title="Zavřít dialog"
           >
-            ✕
+            <CloseIcon size={16} />
           </button>
         </div>
 
@@ -139,15 +141,20 @@ export const EquipmentModal: React.FC<EquipmentModalProps> = ({
             {error && (
               <div
                 style={{
-                  background: 'rgba(239, 68, 68, 0.15)',
-                  border: '1px solid #ef4444',
-                  color: '#fca5a5',
-                  padding: '10px 14px',
-                  borderRadius: '8px',
+                  background: '#fdf0f0',
+                  border: '1px solid #f8c9c9',
+                  borderLeft: '4px solid #8f2323',
+                  color: '#8f2323',
+                  padding: '9px 13px',
+                  borderRadius: '6px',
                   fontSize: '0.85rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
                 }}
               >
-                ⚠️ {error}
+                <AlertIcon size={16} color="#8f2323" />
+                <span>{error}</span>
               </div>
             )}
 
@@ -180,7 +187,7 @@ export const EquipmentModal: React.FC<EquipmentModalProps> = ({
                 >
                   {Object.entries(CATEGORY_LABELS).map(([catKey, info]) => (
                     <option key={catKey} value={catKey}>
-                      {info.icon} {info.label}
+                      {info.label}
                     </option>
                   ))}
                 </select>
@@ -189,7 +196,7 @@ export const EquipmentModal: React.FC<EquipmentModalProps> = ({
 
             <div className="form-group">
               <label className="form-label" htmlFor="input-name">
-                Název & Model kusu *
+                Název a model kusu *
               </label>
               <input
                 id="input-name"
@@ -205,7 +212,7 @@ export const EquipmentModal: React.FC<EquipmentModalProps> = ({
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label" htmlFor="input-size">
-                  Velikost / Parametr *
+                  Velikost / rozměr *
                 </label>
                 <input
                   id="input-size"
@@ -237,7 +244,7 @@ export const EquipmentModal: React.FC<EquipmentModalProps> = ({
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label" htmlFor="input-rate">
-                  Denní sazba výpůjčky (Kč/den) *
+                  Denní sazba (Kč/den) *
                 </label>
                 <input
                   id="input-rate"
@@ -293,7 +300,7 @@ export const EquipmentModal: React.FC<EquipmentModalProps> = ({
               <textarea
                 id="input-notes"
                 className="form-textarea"
-                placeholder="Poznámky pro obsluhu, specifika montáže vázání apod."
+                placeholder="Poznámky pro personál půjčovny, specifika montáže apod."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
               />

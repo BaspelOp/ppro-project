@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { EquipmentItem } from '../types/equipment';
+import { CloseIcon, TrashIcon, AlertIcon } from './Icons';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -37,35 +38,43 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
     <div className="modal-overlay" onClick={onClose} id="confirm-modal-overlay">
       <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 className="modal-title" style={{ color: '#fb7185' }}>
-            🗑️ Vyřadit kus z fondu půjčovny
-          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <TrashIcon size={18} color="#8f2323" />
+            <h2 className="modal-title" style={{ color: '#8f2323' }}>
+              Vyřadit kus z fondu půjčovny
+            </h2>
+          </div>
           <button id="btn-confirm-modal-close" className="modal-close-btn" onClick={onClose}>
-            ✕
+            <CloseIcon size={16} />
           </button>
         </div>
 
         <div className="modal-body">
-          <p style={{ color: '#cbd5e1', fontSize: '0.9rem' }}>
+          <p style={{ color: 'var(--text-primary)', fontSize: '0.9rem' }}>
             Opravdu si přejete vyřadit kus <strong>{item.inventory_number} – {item.name}</strong>?
           </p>
-          <p style={{ color: '#94a3b8', fontSize: '0.8rem' }}>
-            Kus bude označen jako vyřazený (DISCARDED). Záznam a historie zůstanou v databázi pro
-            účetní audit a statistiky opotřebení.
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+            Kus bude označen jako vyřazený (DISCARDED). Záznam a celá historie zůstanou v databázi pro
+            účetní audit a statistiky opotřebení fondu.
           </p>
 
           {error && (
             <div
               style={{
-                background: 'rgba(239, 68, 68, 0.15)',
-                border: '1px solid #ef4444',
-                color: '#fca5a5',
-                padding: '10px 14px',
-                borderRadius: '8px',
+                background: '#fdf0f0',
+                border: '1px solid #f8c9c9',
+                borderLeft: '4px solid #8f2323',
+                color: '#8f2323',
+                padding: '9px 13px',
+                borderRadius: '6px',
                 fontSize: '0.85rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
               }}
             >
-              ⚠️ {error}
+              <AlertIcon size={16} color="#8f2323" />
+              <span>{error}</span>
             </div>
           )}
 
@@ -77,7 +86,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
               id="input-discard-reason"
               type="text"
               className="form-input"
-              placeholder="např. Zlomené jádro lyže, neopravitelná díra v trupu..."
+              placeholder="např. Zlomené jádro lyže, neopravitelná díra v trupu kanoe..."
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

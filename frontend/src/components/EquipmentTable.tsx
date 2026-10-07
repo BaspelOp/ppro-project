@@ -5,6 +5,15 @@ import {
   STATUS_LABELS,
   CONDITION_LABELS,
 } from '../types/equipment';
+import {
+  CategoryIcon,
+  WrenchIcon,
+  CheckIcon,
+  EditIcon,
+  TrashIcon,
+  SearchIcon,
+  RefreshIcon,
+} from './Icons';
 
 interface EquipmentTableProps {
   items: EquipmentItem[];
@@ -25,7 +34,9 @@ export const EquipmentTable: React.FC<EquipmentTableProps> = ({
     return (
       <div className="table-card">
         <div className="empty-state">
-          <div className="empty-icon">⏳</div>
+          <div className="empty-icon-wrap">
+            <RefreshIcon size={32} />
+          </div>
           <div className="empty-title">Načítám evidenci vybavení...</div>
           <p>Komunikuji s backendovým API serverem</p>
         </div>
@@ -37,7 +48,9 @@ export const EquipmentTable: React.FC<EquipmentTableProps> = ({
     return (
       <div className="table-card">
         <div className="empty-state">
-          <div className="empty-icon">🔍</div>
+          <div className="empty-icon-wrap">
+            <SearchIcon size={32} />
+          </div>
           <div className="empty-title">Žádné vybavení neodpovídá zadaným filtrům</div>
           <p>Zkuste upravit vyhledávací výraz nebo zvolit jinou kategorii</p>
         </div>
@@ -49,7 +62,7 @@ export const EquipmentTable: React.FC<EquipmentTableProps> = ({
     <div className="table-card" id="equipment-table-container">
       <div className="table-header-bar">
         <span className="table-count-label">
-          Zobrazeno <strong>{items.length}</strong> kusů vybavení
+          Zobrazeno <strong>{items.length}</strong> položek vybavení
         </span>
       </div>
 
@@ -58,13 +71,13 @@ export const EquipmentTable: React.FC<EquipmentTableProps> = ({
           <thead>
             <tr>
               <th>Inventární kód</th>
-              <th>Vybavení & Model</th>
+              <th>Vybavení a model</th>
               <th>Kategorie</th>
               <th>Velikost</th>
-              <th>Denní sazba / Kauce</th>
+              <th>Sazba a kauce</th>
               <th>Opotřebení</th>
               <th>Provozní stav</th>
-              <th style={{ textAlign: 'right' }}>Rychlé akce</th>
+              <th style={{ textAlign: 'right' }}>Akce</th>
             </tr>
           </thead>
           <tbody>
@@ -81,8 +94,8 @@ export const EquipmentTable: React.FC<EquipmentTableProps> = ({
                   <td>
                     <div className="item-name">{item.name}</div>
                     {item.service_notes && (
-                      <div className="item-notes" style={{ color: '#fbbf24' }}>
-                        🛠️ {item.service_notes}
+                      <div className="item-notes" style={{ color: '#854d0e', fontWeight: 500 }}>
+                        Servis: {item.service_notes}
                       </div>
                     )}
                     {item.notes && !item.service_notes && (
@@ -90,8 +103,9 @@ export const EquipmentTable: React.FC<EquipmentTableProps> = ({
                     )}
                   </td>
                   <td>
-                    <span title={catInfo.label}>
-                      {catInfo.icon} {catInfo.label}
+                    <span className="category-badge-inline" title={catInfo.label}>
+                      <CategoryIcon category={item.category} size={15} color="#5c4d3f" />
+                      <span>{catInfo.label}</span>
                     </span>
                   </td>
                   <td>
@@ -115,7 +129,7 @@ export const EquipmentTable: React.FC<EquipmentTableProps> = ({
                       style={{
                         color: statusInfo.color,
                         backgroundColor: statusInfo.bg,
-                        border: `1px solid ${statusInfo.color}33`,
+                        border: `1px solid ${statusInfo.border}`,
                       }}
                     >
                       <span
@@ -134,7 +148,8 @@ export const EquipmentTable: React.FC<EquipmentTableProps> = ({
                           onClick={() => onServiceAction(item)}
                           title="Odeslat kus do servisu"
                         >
-                          🔧 Servis
+                          <WrenchIcon size={13} color="#824d10" />
+                          <span>Do servisu</span>
                         </button>
                       )}
 
@@ -145,7 +160,8 @@ export const EquipmentTable: React.FC<EquipmentTableProps> = ({
                           onClick={() => onServiceAction(item)}
                           title="Vrátit kus ze servisu zpět do půjčovny"
                         >
-                          ✅ Zpět do provozu
+                          <CheckIcon size={13} color="#22543d" />
+                          <span>Zpět do provozu</span>
                         </button>
                       )}
 
@@ -155,7 +171,7 @@ export const EquipmentTable: React.FC<EquipmentTableProps> = ({
                         onClick={() => onEdit(item)}
                         title="Upravit parametry kusu"
                       >
-                        ✏️
+                        <EditIcon size={13} />
                       </button>
 
                       {item.status !== 'DISCARDED' && item.status !== 'RENTED' && (
@@ -165,7 +181,7 @@ export const EquipmentTable: React.FC<EquipmentTableProps> = ({
                           onClick={() => onDiscard(item)}
                           title="Vyřadit kus z fondu"
                         >
-                          🗑️
+                          <TrashIcon size={13} color="#8f2323" />
                         </button>
                       )}
                     </div>

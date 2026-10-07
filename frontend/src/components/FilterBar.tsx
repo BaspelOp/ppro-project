@@ -5,6 +5,7 @@ import {
   CATEGORY_LABELS,
   STATUS_LABELS,
 } from '../types/equipment';
+import { SearchIcon, CloseIcon, CategoryIcon, LayersIcon } from './Icons';
 
 interface FilterBarProps {
   search: string;
@@ -43,7 +44,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     <div className="filter-container" id="filter-bar">
       <div className="filter-row-top">
         <div className="search-box">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon">
+            <SearchIcon size={16} />
+          </span>
           <input
             id="filter-search-input"
             type="text"
@@ -63,7 +66,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               onSelectStatus(e.target.value ? (e.target.value as EquipmentStatus) : undefined)
             }
           >
-            <option value="">Všechny stavy</option>
+            <option value="">Všechny stavy položek</option>
             {Object.entries(STATUS_LABELS).map(([statusKey, info]) => (
               <option key={statusKey} value={statusKey}>
                 {info.label}
@@ -79,7 +82,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             onClick={onResetFilters}
             title="Zrušit všechny aktivní filtry"
           >
-            <span>✖️</span>
+            <CloseIcon size={14} />
             <span>Reset filtrů</span>
           </button>
         )}
@@ -91,7 +94,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           className={`chip-btn ${selectedCategory === undefined ? 'active' : ''}`}
           onClick={() => onSelectCategory(undefined)}
         >
-          <span>🌐</span>
+          <LayersIcon size={15} />
           <span>Všechny kategorie</span>
         </button>
 
@@ -105,7 +108,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               className={`chip-btn ${isSelected ? 'active' : ''}`}
               onClick={() => onSelectCategory(isSelected ? undefined : catKey)}
             >
-              <span>{item.icon}</span>
+              <CategoryIcon category={catKey} size={15} />
               <span>{item.label}</span>
             </button>
           );

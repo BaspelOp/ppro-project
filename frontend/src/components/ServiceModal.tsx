@@ -5,6 +5,7 @@ import {
   ServiceActionPayload,
   CONDITION_LABELS,
 } from '../types/equipment';
+import { CloseIcon, WrenchIcon, CheckIcon, AlertIcon } from './Icons';
 
 interface ServiceModalProps {
   isOpen: boolean;
@@ -59,11 +60,18 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
     <div className="modal-overlay" onClick={onClose} id="service-modal-overlay">
       <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 className="modal-title">
-            {isGoingToService ? '🔧 Odeslat do servisu' : '✅ Vrátit ze servisu do půjčovny'}
-          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {isGoingToService ? (
+              <WrenchIcon size={18} color="#824d10" />
+            ) : (
+              <CheckIcon size={18} color="#22543d" />
+            )}
+            <h2 className="modal-title">
+              {isGoingToService ? 'Odeslat do servisu' : 'Vrátit ze servisu do půjčovny'}
+            </h2>
+          </div>
           <button id="btn-service-modal-close" className="modal-close-btn" onClick={onClose}>
-            ✕
+            <CloseIcon size={16} />
           </button>
         </div>
 
@@ -71,14 +79,14 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
           <div className="modal-body">
             <div
               style={{
-                background: 'rgba(15, 23, 42, 0.6)',
-                padding: '12px 16px',
-                borderRadius: '8px',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                background: 'var(--bg-primary)',
+                padding: '12px 14px',
+                borderRadius: '6px',
+                border: '1px solid var(--border-medium)',
               }}
             >
-              <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Vybraný kus vybavení:</div>
-              <div style={{ fontWeight: 700, fontSize: '1rem', marginTop: '2px' }}>
+              <div style={{ fontSize: '0.775rem', color: 'var(--text-muted)' }}>Vybraná položka:</div>
+              <div style={{ fontWeight: 700, fontSize: '0.95rem', marginTop: '2px', color: 'var(--text-primary)' }}>
                 <span className="inv-code" style={{ marginRight: '8px' }}>
                   {item.inventory_number}
                 </span>
@@ -89,15 +97,20 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
             {error && (
               <div
                 style={{
-                  background: 'rgba(239, 68, 68, 0.15)',
-                  border: '1px solid #ef4444',
-                  color: '#fca5a5',
-                  padding: '10px 14px',
-                  borderRadius: '8px',
+                  background: '#fdf0f0',
+                  border: '1px solid #f8c9c9',
+                  borderLeft: '4px solid #8f2323',
+                  color: '#8f2323',
+                  padding: '9px 13px',
+                  borderRadius: '6px',
                   fontSize: '0.85rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
                 }}
               >
-                ⚠️ {error}
+                <AlertIcon size={16} color="#8f2323" />
+                <span>{error}</span>
               </div>
             )}
 
@@ -112,8 +125,8 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
                 className="form-textarea"
                 placeholder={
                   isGoingToService
-                    ? 'např. Broušení hran, voskování, uvolněné vázání na levé lyži...'
-                    : 'např. Hrany nabroušeny na 88°, skluznice napuštěna fluor voskem...'
+                    ? 'např. Broušení hran, voskování skluznice, seřízení bezpečnostního vázání...'
+                    : 'např. Hrany nabroušeny, voskováno, přetlakové ventily otestovány...'
                 }
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}

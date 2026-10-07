@@ -16,6 +16,7 @@ import { EquipmentTable } from './components/EquipmentTable';
 import { EquipmentModal } from './components/EquipmentModal';
 import { ServiceModal } from './components/ServiceModal';
 import { ConfirmModal } from './components/ConfirmModal';
+import { CheckIcon, CloseIcon, InfoIcon, AlertIcon } from './components/Icons';
 
 interface Toast {
   id: string;
@@ -103,13 +104,13 @@ export const App: React.FC = () => {
 
   const handleCreateItem = async (data: EquipmentItemCreate) => {
     await equipmentApi.create(data);
-    addToast('success', `Kus ${data.inventory_number} byl úspěšně zaevidován.`);
+    addToast('success', `Kus ${data.inventory_number} byl úspěšně zaevidován do fondu.`);
     await loadData();
   };
 
   const handleUpdateItem = async (id: number, data: EquipmentItemUpdate) => {
     const updated = await equipmentApi.update(id, data);
-    addToast('success', `Záznam ${updated.inventory_number} byl upraven.`);
+    addToast('success', `Položka ${updated.inventory_number} byla upravena.`);
     await loadData();
   };
 
@@ -123,7 +124,7 @@ export const App: React.FC = () => {
 
   const handleConfirmDiscard = async (id: number, reason?: string) => {
     const discarded = await equipmentApi.discard(id, reason);
-    addToast('info', `Kus ${discarded.inventory_number} byl vyřazen z provozu.`);
+    addToast('info', `Kus ${discarded.inventory_number} byl vyřazen z fondu.`);
     await loadData();
   };
 
@@ -145,20 +146,20 @@ export const App: React.FC = () => {
       />
 
       <main className="main-content">
-        {/* Banner pro demonstraci klientovi */}
+        {/* Banner klientské konzultace */}
         <div className="client-note-banner" id="client-demo-banner">
           <div className="client-note-content">
-            <span className="client-note-badge">Klientské demo</span>
+            <span className="client-note-badge">Prototyp k ověření</span>
             <span className="client-note-text">
-              <strong>Zadání D: Půjčovna vybavení „Hory a voda“</strong> – Úvodní interaktivní prototyp pro
-              odsouhlasení konceptu. Správa inventárních položek, ranní přehledový dashboard a servisní odstávky.
+              <strong>Zadání D: Půjčovna vybavení „Hory a voda“</strong> – Evidence položek, ranní přehledový dashboard a servisní odstávky pro konzultaci s klientem.
             </span>
           </div>
           <button
             className="btn btn-secondary btn-sm"
-            onClick={() => addToast('info', 'Zpětná vazba klienta bude zapracována do Fáze 2 (Výpůjčky a Zákazníci).')}
+            onClick={() => addToast('info', 'Zpětná vazba klienta k designu byla zapracována (teplá béžovo-hnědá paleta, flat styl, vektorové SVG ikony).')}
           >
-            ℹ️ Otevřené body klienta
+            <InfoIcon size={14} />
+            <span>Záznam rozhodnutí</span>
           </button>
         </div>
 
@@ -169,7 +170,7 @@ export const App: React.FC = () => {
           onSelectStatus={setSelectedStatus}
         />
 
-        {/* Vyhledávání a filtry pro sobotní špičku */}
+        {/* Vyhledávání a filtry */}
         <FilterBar
           search={search}
           onSearchChange={setSearch}
@@ -214,11 +215,13 @@ export const App: React.FC = () => {
         item={discardItem}
       />
 
-      {/* Notifikace Toasty */}
+      {/* Notifikace Toasty (Flat warm design bez emoji) */}
       <div className="toast-container" id="toast-container">
         {toasts.map((toast) => (
           <div key={toast.id} className={`toast toast-${toast.type}`}>
-            <span>{toast.type === 'success' ? '✅' : toast.type === 'error' ? '❌' : 'ℹ️'}</span>
+            {toast.type === 'success' && <CheckIcon size={16} color="#22543d" />}
+            {toast.type === 'error' && <AlertIcon size={16} color="#8f2323" />}
+            {toast.type === 'info' && <InfoIcon size={16} color="#8c5836" />}
             <span>{toast.message}</span>
           </div>
         ))}

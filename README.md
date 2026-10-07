@@ -353,6 +353,11 @@ py -3.12 -m pytest
 ## 7. Deník vývoje (Changelog)
 
 - **2026-10-07:**
+  - **Zpětná vazba klienta k designu (Odmítnutí generického AI vzhledu a emoji):**
+    - Kompletní odstranění emoji napříč celou aplikací (včetně faviconu a kategorií).
+    - Vytvoření knihovny čistých plochých vektorových SVG ikon ([Icons.tsx](file:///p:/ppro/project/frontend/src/components/Icons.tsx)) pro kategorie, akce, stavy i logo půjčovny.
+    - Přechod na teplou přírodní paletu odpovídající outdoorové a vodácké/horské půjčovně (teplý béžový pergamen `#f8f5ee`, písek `#f1ebd9`, kávová hnědá `#5a3821`, terakota `#8c5836` a lesní zeleň `#22543d`).
+    - Plochý (flat) styl s papírovou hloubkou, zřetelnými rámečky a vyšším kontrastem pro ranní víkendovou špičku obsluhy.
   - **FÁZE 1 – Implementace klientského MVP prototypu (Zadání D: Půjčovna vybavení „Hory a voda“):**
     - Vytvoření 3-vrstvé architektury se striktně jednosměrnými závislostmi.
     - **Datová vrstva:** SQLAlchemy model `EquipmentItem`, migrační skript Alembic `001_initial_equipment.py`, `EquipmentRepository` pro CRUD a filtrování.

@@ -71,29 +71,52 @@ export interface EquipmentStats {
   by_category: Record<string, number>;
 }
 
-export const CATEGORY_LABELS: Record<EquipmentCategory, { label: string; icon: string }> = {
-  SKIS: { label: 'Lyže', icon: '🎿' },
-  SNOWBOARD: { label: 'Snowboard', icon: '🏂' },
-  BOOTS: { label: 'Boty', icon: '🥾' },
-  POLES: { label: 'Hole', icon: '🥢' },
-  BOAT: { label: 'Kanoe / Lodě', icon: '🛶' },
-  RAFT: { label: 'Rafty', icon: '⛵' },
-  PADDLE: { label: 'Pádla', icon: '🚣' },
-  LIFE_JACKET: { label: 'Vesty', icon: '🦺' },
-  HELMET: { label: 'Helmy', icon: '⛑️' },
-  OTHER: { label: 'Ostatní', icon: '📦' },
+export const CATEGORY_LABELS: Record<EquipmentCategory, { label: string; key: EquipmentCategory }> = {
+  SKIS: { label: 'Lyže', key: 'SKIS' },
+  SNOWBOARD: { label: 'Snowboard', key: 'SNOWBOARD' },
+  BOOTS: { label: 'Boty', key: 'BOOTS' },
+  POLES: { label: 'Hole', key: 'POLES' },
+  BOAT: { label: 'Kanoe a lodě', key: 'BOAT' },
+  RAFT: { label: 'Rafty', key: 'RAFT' },
+  PADDLE: { label: 'Pádla', key: 'PADDLE' },
+  LIFE_JACKET: { label: 'Vesty', key: 'LIFE_JACKET' },
+  HELMET: { label: 'Helmy', key: 'HELMET' },
+  OTHER: { label: 'Ostatní', key: 'OTHER' },
 };
 
-export const STATUS_LABELS: Record<EquipmentStatus, { label: string; color: string; bg: string }> = {
-  AVAILABLE: { label: 'K dispozici', color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' },
-  RENTED: { label: 'Zapůjčeno', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.12)' },
-  IN_SERVICE: { label: 'V servisu', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' },
-  DISCARDED: { label: 'Vyřazeno', color: '#64748b', bg: 'rgba(100, 116, 139, 0.12)' },
+export const STATUS_LABELS: Record<
+  EquipmentStatus,
+  { label: string; color: string; bg: string; border: string }
+> = {
+  AVAILABLE: {
+    label: 'K dispozici',
+    color: '#245a43',
+    bg: '#edf7f1',
+    border: '#c3e6d2',
+  },
+  RENTED: {
+    label: 'Zapůjčeno',
+    color: '#26425a',
+    bg: '#edf4f9',
+    border: '#c5d9e8',
+  },
+  IN_SERVICE: {
+    label: 'V servisu',
+    color: '#854d0e',
+    bg: '#fef9c3',
+    border: '#fde047',
+  },
+  DISCARDED: {
+    label: 'Vyřazeno',
+    color: '#57534e',
+    bg: '#f5f5f4',
+    border: '#d6d3d1',
+  },
 };
 
 export const CONDITION_LABELS: Record<EquipmentCondition, { label: string; color: string }> = {
-  NEW: { label: 'Nové / Zánovní', color: '#10b981' },
-  GOOD: { label: 'Dobré', color: '#0ea5e9' },
-  WORN: { label: 'Opotřebené', color: '#f59e0b' },
-  DAMAGED: { label: 'Poškozené', color: '#ef4444' },
+  NEW: { label: 'Nové / Zánovní', color: '#245a43' },
+  GOOD: { label: 'Dobré', color: '#4a6b6c' },
+  WORN: { label: 'Opotřebené', color: '#854d0e' },
+  DAMAGED: { label: 'Poškozené', color: '#991b1b' },
 };
