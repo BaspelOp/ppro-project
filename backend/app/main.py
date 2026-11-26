@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import engine, SessionLocal
 from app.models.base import Base
+import app.models  # noqa: F401 - zajišťuje registraci všech 6 entit v SQLAlchemy metadata
 from app.seed import seed_database
 from app.api.v1.api import api_router
 

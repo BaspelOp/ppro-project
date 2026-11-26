@@ -8,14 +8,27 @@ import {
   EquipmentStatus,
   ServiceActionPayload,
 } from './types/equipment';
-import { equipmentApi } from './services/api';
+import {
+  ActiveTab,
+  Category,
+  CategoryUpdate,
+  Customer,
+  CustomerCreate,
+  Rental,
+  RentalCreate,
+  ReturnItemPayload,
+} from './types/phase2';
+import { equipmentApi, categoriesApi, customersApi, rentalsApi } from './services/api';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { EquipmentTable } from './components/EquipmentTable';
 import { EquipmentModal } from './components/EquipmentModal';
 import { ServiceModal } from './components/ServiceModal';
 import { ConfirmModal } from './components/ConfirmModal';
-import { CheckIcon, CloseIcon, InfoIcon, AlertIcon } from './components/Icons';
+import { RentalsView } from './components/RentalsView';
+import { CustomersView } from './components/CustomersView';
+import { CategoriesView } from './components/CategoriesView';
+import { CheckIcon, InfoIcon, AlertIcon } from './components/Icons';
 
 interface Toast {
   id: string;
@@ -24,11 +37,17 @@ interface Toast {
 }
 
 export const App: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<ActiveTab>('equipment');
+
   const [items, setItems] = useState<EquipmentItem[]>([]);
+  const [allItems, setAllItems] = useState<EquipmentItem[]>([]);
   const [stats, setStats] = useState<EquipmentStats | null>(null);
+  const [rentals, setRentals] = useState<Rental[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Filtry
+  // Filtry pro vybavení
   const [search, setSearch] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<EquipmentCategory | undefined>(undefined);
   const [selectedStatus, setSelectedStatus] = useState<EquipmentStatus | undefined>(undefined);
@@ -57,16 +76,25 @@ export const App: React.FC = () => {
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [fetchedStats, fetchedItems] = await Promise.all([
-        equipmentApi.getStats(),
-        equipmentApi.list({
-          category: selectedCategory,
-          status: selectedStatus,
-          search: search.trim() || undefined,
-        }),
-      ]);
+      const [fetchedStats, fetchedItems, fetchedAll, fetchedRentals, fetchedCustomers, fetchedCategories] =
+        await Promise.all([
+          equipmentApi.getStats(),
+          equipmentApi.list({
+            category: selectedCategory,
+            status: selectedStatus,
+            search: search.trim() || undefined,
+          }),
+          equipmentApi.list(),
+          rentalsApi.list(),
+          customersApi.list(),
+          categoriesApi.list(),
+        ]);
       setStats(fetchedStats);
       setItems(fetchedItems);
+      setAllItems(fetchedAll);
+      setRentals(fetchedRentals);
+      setCustomers(fetchedCustomers);
+      setCategories(fetchedCategories);
     } catch (err: any) {
       addToast('error', `Chyba při načítání dat: ${err.message}`);
     } finally {
@@ -127,6 +155,61 @@ export const App: React.FC = () => {
     await loadData();
   };
 
+  const handleCreateRental = async (data: RentalCreate) => {
+    const created = await rentalsApi.create(data);
+    addToast(
+      'success',
+      `Smlouva #${created.id} (${created.status}) byla vytvořena (${created.items.length} ks).`
+    );
+    await loadData();
+  };
+
+  const handleActivateReservation = async (id: number) => {
+    try {
+      await rentalsApi.activate(id);
+      addToast('success', `Rezervace #${id} byla vydána zákazníkovi.`);
+      await loadData();
+    } catch (err: any) {
+      addToast('error', err.message);
+    }
+  };
+
+  const handleCancelRental = async (id: number) => {
+    try {
+      await rentalsApi.cancel(id, 'Stornováno obsluhou');
+      addToast('info', `Rezervace #${id} byla stornována (historie zachována).`);
+      await loadData();
+    } catch (err: any) {
+      addToast('error', err.message);
+    }
+  };
+
+  const handleReturnItem = async (
+    rentalId: number,
+    rentalItemId: number,
+    payload: ReturnItemPayload
+  ) => {
+    try {
+      await rentalsApi.returnItem(rentalId, rentalItemId, payload);
+      addToast('success', `Položka byla vrácena ze smlouvy #${rentalId}.`);
+      await loadData();
+    } catch (err: any) {
+      addToast('error', err.message);
+    }
+  };
+
+  const handleCreateCustomer = async (data: CustomerCreate) => {
+    const created = await customersApi.create(data);
+    addToast('success', `Zákazník ${created.name} byl zaregistrován.`);
+    await loadData();
+  };
+
+  const handleUpdateCategory = async (id: number, data: CategoryUpdate) => {
+    const updated = await categoriesApi.update(id, data);
+    addToast('success', `Tarif kategorie ${updated.name} byl aktualizován.`);
+    await loadData();
+  };
+
   const handleResetFilters = () => {
     setSearch('');
     setSelectedCategory(undefined);
@@ -139,36 +222,70 @@ export const App: React.FC = () => {
   return (
     <div className="brutalist-app">
       <Header
+        activeTab={activeTab}
+        onChangeTab={setActiveTab}
         onOpenCreateModal={handleOpenCreateModal}
         onRefresh={loadData}
         isLoading={isLoading}
       />
 
-      <main className="dispatch-desk">
-        {/* Levý navigační a filtrovací rail */}
-        <Sidebar
-          stats={stats}
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
-          selectedStatus={selectedStatus}
-          onSelectStatus={setSelectedStatus}
-        />
+      {activeTab === 'equipment' && (
+        <main className="dispatch-desk">
+          <Sidebar
+            stats={stats}
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+            selectedStatus={selectedStatus}
+            onSelectStatus={setSelectedStatus}
+          />
 
-        {/* Hlavní manifest tabulka s horním panelem */}
-        <EquipmentTable
-          items={items}
-          isLoading={isLoading}
-          search={search}
-          onSearchChange={setSearch}
-          selectedCategory={selectedCategory}
-          selectedStatus={selectedStatus}
-          onResetFilters={handleResetFilters}
-          hasActiveFilters={hasActiveFilters}
-          onEdit={handleOpenEditModal}
-          onServiceAction={handleOpenServiceModal}
-          onDiscard={handleOpenDiscardModal}
-        />
-      </main>
+          <EquipmentTable
+            items={items}
+            isLoading={isLoading}
+            search={search}
+            onSearchChange={setSearch}
+            selectedCategory={selectedCategory}
+            selectedStatus={selectedStatus}
+            onResetFilters={handleResetFilters}
+            hasActiveFilters={hasActiveFilters}
+            onEdit={handleOpenEditModal}
+            onServiceAction={handleOpenServiceModal}
+            onDiscard={handleOpenDiscardModal}
+          />
+        </main>
+      )}
+
+      {activeTab === 'rentals' && (
+        <main className="dispatch-desk" style={{ gridTemplateColumns: '1fr' }}>
+          <RentalsView
+            rentals={rentals}
+            customers={customers}
+            equipment={allItems}
+            onCreateRental={handleCreateRental}
+            onActivateReservation={handleActivateReservation}
+            onCancelRental={handleCancelRental}
+            onReturnItem={handleReturnItem}
+          />
+        </main>
+      )}
+
+      {activeTab === 'customers' && (
+        <main className="dispatch-desk" style={{ gridTemplateColumns: '1fr' }}>
+          <CustomersView
+            customers={customers}
+            onCreateCustomer={handleCreateCustomer}
+          />
+        </main>
+      )}
+
+      {activeTab === 'categories' && (
+        <main className="dispatch-desk" style={{ gridTemplateColumns: '1fr' }}>
+          <CategoriesView
+            categories={categories}
+            onUpdateCategory={handleUpdateCategory}
+          />
+        </main>
+      )}
 
       {/* Modální okna */}
       <EquipmentModal

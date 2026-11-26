@@ -1,19 +1,25 @@
+from datetime import datetime, timezone
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.models.equipment import EquipmentItem, EquipmentCategory, EquipmentStatus, EquipmentCondition
+from app.models.service_record import ServiceRecord
 from app.schemas.equipment import (
     EquipmentItemCreate,
     EquipmentItemUpdate,
     EquipmentServiceAction,
 )
 from app.repositories.equipment_repository import EquipmentRepository
+from app.repositories.category_repository import CategoryRepository
+from app.repositories.service_record_repository import ServiceRecordRepository
 
 
 class EquipmentService:
     def __init__(self, db: Session):
         self.db = db
         self.repository = EquipmentRepository(db)
+        self.category_repo = CategoryRepository(db)
+        self.service_record_repo = ServiceRecordRepository(db)
 
     def get_item(self, item_id: int) -> EquipmentItem:
         item = self.repository.get(item_id)
@@ -52,11 +58,15 @@ class EquipmentService:
                 detail=f"Inventární číslo '{item_in.inventory_number}' již v evidenci existuje. Každý kus musí mít unikátní označení."
             )
 
+        # Propojení s entitou Category, pokud existuje v DB
+        cat_obj = self.category_repo.get_by_code(item_in.category.value)
+
         # Nový kus začíná vždy ve stavu AVAILABLE
         db_item = EquipmentItem(
             inventory_number=item_in.inventory_number.strip().upper(),
             name=item_in.name.strip(),
             category=item_in.category,
+            category_id=cat_obj.id if cat_obj else None,
             size=item_in.size.strip(),
             purchase_year=item_in.purchase_year,
             daily_rate=item_in.daily_rate,
@@ -117,6 +127,16 @@ class EquipmentService:
             if action_data.new_condition:
                 item.condition = action_data.new_condition
 
+            # Záznam servisního zásahu (ServiceRecord - OB-3)
+            self.db.add(
+                ServiceRecord(
+                    equipment_item_id=item.id,
+                    service_start=datetime.now(timezone.utc).replace(tzinfo=None),
+                    issue_description=action_data.service_notes or "Odesláno do servisu / údržby",
+                    cost=action_data.cost or 0.0,
+                )
+            )
+
         elif action == "RETURN_FROM_SERVICE":
             if item.status != EquipmentStatus.IN_SERVICE:
                 raise HTTPException(
@@ -130,6 +150,15 @@ class EquipmentService:
                 item.condition = action_data.new_condition
             else:
                 item.condition = EquipmentCondition.GOOD
+
+            # Uzavření otevřeného servisního záznamu
+            open_record = self.service_record_repo.get_open_record_for_item(item.id)
+            if open_record:
+                open_record.service_end = datetime.now(timezone.utc).replace(tzinfo=None)
+                if action_data.service_notes:
+                    open_record.resolution_notes = action_data.service_notes
+                if action_data.cost is not None and action_data.cost > 0:
+                    open_record.cost = action_data.cost
 
         else:
             raise HTTPException(

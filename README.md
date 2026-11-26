@@ -18,9 +18,9 @@ Aplikace musí splňovat následující kritéria definovaná zadáním:
   - *Aplikační / Byznys vrstva* (`EquipmentService`, validace unikátnosti kódů, stavový automat, servisní pravidla)
   - *Datová / Infrastrukturní vrstva* (SQLAlchemy ORM, `EquipmentRepository`, Alembic migrace, PostgreSQL v Dockeru / SQLite)
   - Závislosti striktně jednosměrné (Prezentace $\rightarrow$ Byznys $\rightarrow$ Data).
-- [x] **Relační databáze v Dockeru s migracemi:** Schéma verze řízeno striktně migračními skripty Alembic (`001_initial_equipment.py`).
-- [ ] **Datový model:** Ve Fázi 1 implementována 1. klíčová entita (`EquipmentItem`), ve Fázi 2 rozšíření na 5 doménových entit s vazbou M:N (`RentalItem`).
-- [x] **Automatizované testy:** Pytest testy byznys pravidel, stavových přechodů a REST API integrační testy (7 testů, 100% úspěšnost).
+- [x] **Relační databáze v Dockeru s migracemi:** Schéma verze řízeno striktně migračními skripty Alembic (`001_initial_equipment.py`, `002_phase2_full_model.py`).
+- [x] **Datový model:** Plný 6-entitní model (`Category`, `EquipmentItem`, `Customer`, `Rental`, `RentalItem` – vazba M:N, `ServiceRecord`).
+- [x] **Automatizované testy:** Pytest testy byznys pravidel, stavových přechodů, blokace překryvů, výpočtu penále a REST API integrační testy (12 testů, 100% úspěšnost).
 - [x] **Spuštění jedním příkazem:** Kompletní stack (databáze + backend + frontend) spustitelný přes `docker compose up --build`.
 - [x] **Syntetická data:** Bezpečná syntetická testovací data (18 reálných položek půjčovny – lyže, snowboardy, kanoe, rafty, vesty) s automatickým seedem.
 - [x] **Technická dokumentace:** Tento soubor (`README.md`) udržovaný jako aktuální zdroj pravdy (SSOT).
@@ -352,6 +352,13 @@ py -3.12 -m pytest
 
 ## 7. Deník vývoje (Changelog)
 
+- **2026-11-26:**
+  - **FÁZE 2 – Plný datový model (6 entit vč. vazby M:N) a klíčová byznys pravidla:**
+    - **Datová vrstva & migrace:** Přidány SQLAlchemy modely `Category`, `Customer`, `Rental`, `RentalItem` (vazba M:N mezi výpůjčkou a kusem vybavení) a `ServiceRecord`, propojení `EquipmentItem.category_id` FK a Alembic migrace `002_phase2_full_model.py`.
+    - **Byznys vrstva:** Implementovány služby `CategoryService`, `CustomerService`, `RentalService` a `ServiceRecordService`. Striktně vynucena pravidla: zákaz překrývajících se výpůjček/rezervací téhož kusu, zákaz půjčení kusu v servisu/vyřazeného, automatický výpočet penále za každý započatý den prodlení, podpora částečného vrácení (OB-4), fixace sjednané sazby (OB-5), nemazání historie výpůjček a automatické zakládání/uzavírání `ServiceRecord` (OB-3).
+    - **REST API & Seed:** Nové endpointy `/api/v1/categories`, `/api/v1/customers`, `/api/v1/rentals` (vč. `/activate`, `/cancel`, `/items/{id}/return`) a `/api/v1/service-records`. Rozšířen `seed.py` o syntetické kategorie, zákazníky, aktivní/prodlené výpůjčky, rezervaci a servisní záznamy.
+    - **Frontend (Neo-Brutalismus):** Přidána horní navigace (`01_VYBAVENÍ`, `02_VÝPŮJČKY`, `03_ZÁKAZNÍCI`, `04_CENÍK`) a komponenty `RentalsView.tsx`, `CustomersView.tsx`, `CategoriesView.tsx`.
+    - **Testy:** Rozšířeno na 12 automatizovaných Pytest testů (všechny 100% úspěšné) + ověřen produkční Vite build frontendu.
 - **2026-10-07:**
   - **Reakce na zpětnou vazbu klienta (Přepracování wireframu a stylu na Minimalistický Neo-Brutalismus):**
     - Klient odmítl generický layout plovoucích SaaS karet s požadavkem na svébytný wireframe a styl minimalismu spojeného s brutalismem.

@@ -1,5 +1,31 @@
+from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
+from app.models.category import Category
+from app.models.customer import Customer
 from app.models.equipment import EquipmentItem, EquipmentCategory, EquipmentStatus, EquipmentCondition
+from app.models.rental import Rental, RentalItem, RentalStatus
+from app.models.service_record import ServiceRecord
+
+
+SAMPLE_CATEGORIES = [
+    {"code": "SKIS", "name": "Lyže", "default_daily_rate": 400.0, "default_deposit": 2000.0, "description": "Sjezdové, carvingové a skialpové lyže"},
+    {"code": "SNOWBOARD", "name": "Snowboardy", "default_daily_rate": 380.0, "default_deposit": 2000.0, "description": "All-mountain a freestyle snowboardy s vázáním"},
+    {"code": "BOOTS", "name": "Boty", "default_daily_rate": 180.0, "default_deposit": 1000.0, "description": "Lyžařské a snowboardové boty"},
+    {"code": "POLES", "name": "Hole", "default_daily_rate": 60.0, "default_deposit": 300.0, "description": "Sjezdové a skialpové hole"},
+    {"code": "BOAT", "name": "Lodě / Kanoe", "default_daily_rate": 300.0, "default_deposit": 1500.0, "description": "Plastové a nafukovací kanoe"},
+    {"code": "RAFT", "name": "Rafty", "default_daily_rate": 750.0, "default_deposit": 4000.0, "description": "Vícemístné nafukovací rafty"},
+    {"code": "PADDLE", "name": "Pádla", "default_daily_rate": 50.0, "default_deposit": 200.0, "description": "Kanoistická a raftová pádla"},
+    {"code": "LIFE_JACKET", "name": "Vesty", "default_daily_rate": 70.0, "default_deposit": 400.0, "description": "Certifikované záchranné a vodácké vesty"},
+    {"code": "HELMET", "name": "Helmy", "default_daily_rate": 90.0, "default_deposit": 500.0, "description": "Lyžařské a vodácké přilby"},
+    {"code": "OTHER", "name": "Ostatní", "default_daily_rate": 100.0, "default_deposit": 500.0, "description": "Doplňkové vybavení a příslušenství"},
+]
+
+SAMPLE_CUSTOMERS = [
+    {"name": "Jan Novotný", "phone": "+420 602 111 222", "email": "jan.novotny@example.cz", "id_card_number": "OP-2024001", "notes": "Stálý zákazník, jezdí pravidelně do Krkonoš"},
+    {"name": "Petra Svobodová", "phone": "+420 777 333 444", "email": "petra.svobodova@example.cz", "id_card_number": "OP-2024002", "notes": "Preferuje snowboardové sety"},
+    {"name": "Tomáš Dvořák", "phone": "+420 608 555 666", "email": "tomas.dvorak@example.cz", "id_card_number": "OP-2024003", "notes": "Vodácký oddíl Hradec Králové"},
+    {"name": "Lucie Černá", "phone": "+420 731 777 888", "email": "lucie.cerna@example.cz", "id_card_number": "OP-2024004", "notes": "Rodinné výpůjčky"},
+]
 
 
 SAMPLE_EQUIPMENT = [
@@ -225,16 +251,118 @@ SAMPLE_EQUIPMENT = [
 
 
 def seed_database(db: Session) -> int:
-    """Populates the database with realistic synthetic equipment items if empty."""
-    count = db.query(EquipmentItem).count()
-    if count > 0:
-        return 0
+    """Populates the database with realistic synthetic data (Categories, Equipment, Customers, Rentals, ServiceRecords) if empty."""
+    # 1. Seed categories if empty
+    cat_map = {}
+    if db.query(Category).count() == 0:
+        for cat_data in SAMPLE_CATEGORIES:
+            cat = Category(**cat_data)
+            db.add(cat)
+        db.flush()
+    for cat in db.query(Category).all():
+        cat_map[cat.code] = cat.id
 
+    # 2. Seed equipment items if empty
+    count = db.query(EquipmentItem).count()
     created_count = 0
-    for data in SAMPLE_EQUIPMENT:
-        item = EquipmentItem(**data)
-        db.add(item)
-        created_count += 1
+    if count == 0:
+        for data in SAMPLE_EQUIPMENT:
+            item_data = dict(data)
+            cat_code = item_data["category"].value if hasattr(item_data["category"], "value") else str(item_data["category"])
+            item_data["category_id"] = cat_map.get(cat_code)
+            item = EquipmentItem(**item_data)
+            db.add(item)
+            created_count += 1
+        db.flush()
+
+    # 3. Seed customers if empty
+    if db.query(Customer).count() == 0:
+        for cust_data in SAMPLE_CUSTOMERS:
+            db.add(Customer(**cust_data))
+        db.flush()
+
+    # 4. Seed service records for items currently IN_SERVICE if empty
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    if db.query(ServiceRecord).count() == 0:
+        in_service_items = db.query(EquipmentItem).filter(EquipmentItem.status == EquipmentStatus.IN_SERVICE).all()
+        for eq in in_service_items:
+            db.add(
+                ServiceRecord(
+                    equipment_item_id=eq.id,
+                    service_start=now - timedelta(days=2),
+                    issue_description=eq.service_notes or "Pravidelná údržba a seřízení",
+                    cost=350.0,
+                )
+            )
+        db.flush()
+
+    # 5. Seed sample rentals (M:N) if empty
+    if db.query(Rental).count() == 0:
+        customers = db.query(Customer).order_by(Customer.id.asc()).all()
+        eq_by_inv = {eq.inventory_number: eq for eq in db.query(EquipmentItem).all()}
+
+        if len(customers) >= 3 and "SKI-003" in eq_by_inv and "SNW-002" in eq_by_inv and "BOAT-002" in eq_by_inv:
+            # Aktivní výpůjčka 1 (aktuálně v termínu)
+            r1 = Rental(
+                customer_id=customers[0].id,
+                rental_start=now - timedelta(days=1),
+                rental_end=now + timedelta(days=2),
+                total_deposit=eq_by_inv["SKI-003"].deposit,
+                discount_amount=0.0,
+                total_price=eq_by_inv["SKI-003"].daily_rate * 3,
+                status=RentalStatus.ACTIVE,
+                notes="Víkendový výjezd Pec pod Sněžkou",
+            )
+            db.add(r1)
+            db.flush()
+            db.add(RentalItem(
+                rental_id=r1.id,
+                equipment_item_id=eq_by_inv["SKI-003"].id,
+                agreed_daily_rate=eq_by_inv["SKI-003"].daily_rate,
+                agreed_deposit=eq_by_inv["SKI-003"].deposit,
+            ))
+
+            # Aktivní výpůjčka 2 (po termínu - pro demonstraci výpočtu penále)
+            r2 = Rental(
+                customer_id=customers[1].id,
+                rental_start=now - timedelta(days=4),
+                rental_end=now - timedelta(days=1),
+                total_deposit=eq_by_inv["SNW-002"].deposit,
+                discount_amount=0.0,
+                total_price=eq_by_inv["SNW-002"].daily_rate * 3,
+                status=RentalStatus.ACTIVE,
+                notes="Po termínu vrácení – při vrácení se automaticky napočítá penále",
+            )
+            db.add(r2)
+            db.flush()
+            db.add(RentalItem(
+                rental_id=r2.id,
+                equipment_item_id=eq_by_inv["SNW-002"].id,
+                agreed_daily_rate=eq_by_inv["SNW-002"].daily_rate,
+                agreed_deposit=eq_by_inv["SNW-002"].deposit,
+            ))
+
+            # Budoucí rezervace 3 (RESERVED)
+            if "RAFT-001" in eq_by_inv and "VES-002" in eq_by_inv:
+                r3 = Rental(
+                    customer_id=customers[2].id,
+                    rental_start=now + timedelta(days=5),
+                    rental_end=now + timedelta(days=7),
+                    total_deposit=eq_by_inv["RAFT-001"].deposit + eq_by_inv["VES-002"].deposit,
+                    discount_amount=100.0,
+                    total_price=(eq_by_inv["RAFT-001"].daily_rate + eq_by_inv["VES-002"].daily_rate) * 2 - 100.0,
+                    status=RentalStatus.RESERVED,
+                    notes="Rezervace na příští víkend – sjezd Orlice",
+                )
+                db.add(r3)
+                db.flush()
+                for inv in ("RAFT-001", "VES-002"):
+                    db.add(RentalItem(
+                        rental_id=r3.id,
+                        equipment_item_id=eq_by_inv[inv].id,
+                        agreed_daily_rate=eq_by_inv[inv].daily_rate,
+                        agreed_deposit=eq_by_inv[inv].deposit,
+                    ))
 
     db.commit()
     return created_count

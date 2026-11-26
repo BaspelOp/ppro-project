@@ -7,6 +7,17 @@ import {
   EquipmentCategory,
   EquipmentStatus,
 } from '../types/equipment';
+import {
+  Category,
+  CategoryUpdate,
+  Customer,
+  CustomerCreate,
+  Rental,
+  RentalCreate,
+  RentalStatus,
+  ReturnItemPayload,
+  ServiceRecord,
+} from '../types/phase2';
 
 const API_BASE = '/api/v1';
 
@@ -87,5 +98,76 @@ export const equipmentApi = {
       method: 'DELETE',
     });
     return handleResponse<EquipmentItem>(res);
+  },
+};
+
+export const categoriesApi = {
+  async list(): Promise<Category[]> {
+    const res = await fetch(`${API_BASE}/categories`);
+    return handleResponse<Category[]>(res);
+  },
+  async update(id: number, data: CategoryUpdate): Promise<Category> {
+    const res = await fetch(`${API_BASE}/categories/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return handleResponse<Category>(res);
+  },
+};
+
+export const customersApi = {
+  async list(search?: string): Promise<Customer[]> {
+    const url = `${API_BASE}/customers${search ? `?search=${encodeURIComponent(search)}` : ''}`;
+    const res = await fetch(url);
+    return handleResponse<Customer[]>(res);
+  },
+  async create(data: CustomerCreate): Promise<Customer> {
+    const res = await fetch(`${API_BASE}/customers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return handleResponse<Customer>(res);
+  },
+};
+
+export const rentalsApi = {
+  async list(status?: RentalStatus): Promise<Rental[]> {
+    const url = `${API_BASE}/rentals${status ? `?status=${status}` : ''}`;
+    const res = await fetch(url);
+    return handleResponse<Rental[]>(res);
+  },
+  async create(data: RentalCreate): Promise<Rental> {
+    const res = await fetch(`${API_BASE}/rentals`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return handleResponse<Rental>(res);
+  },
+  async activate(id: number): Promise<Rental> {
+    const res = await fetch(`${API_BASE}/rentals/${id}/activate`, { method: 'POST' });
+    return handleResponse<Rental>(res);
+  },
+  async cancel(id: number, reason?: string): Promise<Rental> {
+    const url = `${API_BASE}/rentals/${id}/cancel${reason ? `?reason=${encodeURIComponent(reason)}` : ''}`;
+    const res = await fetch(url, { method: 'POST' });
+    return handleResponse<Rental>(res);
+  },
+  async returnItem(rentalId: number, rentalItemId: number, payload: ReturnItemPayload): Promise<Rental> {
+    const res = await fetch(`${API_BASE}/rentals/${rentalId}/items/${rentalItemId}/return`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    return handleResponse<Rental>(res);
+  },
+};
+
+export const serviceRecordsApi = {
+  async listForItem(equipmentItemId: number): Promise<ServiceRecord[]> {
+    const res = await fetch(`${API_BASE}/service-records/equipment/${equipmentItemId}`);
+    return handleResponse<ServiceRecord[]>(res);
   },
 };

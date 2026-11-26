@@ -1,6 +1,7 @@
 import enum
 from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, String, Float, DateTime, Enum as SQLEnum, Text
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Enum as SQLEnum, Text
+from sqlalchemy.orm import relationship
 from app.models.base import Base
 
 
@@ -38,6 +39,7 @@ class EquipmentItem(Base):
     inventory_number = Column(String(50), unique=True, index=True, nullable=False)
     name = Column(String(150), nullable=False)
     category = Column(SQLEnum(EquipmentCategory, native_enum=False), nullable=False, index=True)
+    category_id = Column(Integer, ForeignKey("categories.id"), nullable=True, index=True)
     size = Column(String(50), nullable=False)
     purchase_year = Column(Integer, nullable=False)
     daily_rate = Column(Float, nullable=False, default=250.0)
@@ -46,9 +48,13 @@ class EquipmentItem(Base):
     status = Column(SQLEnum(EquipmentStatus, native_enum=False), nullable=False, default=EquipmentStatus.AVAILABLE, index=True)
     service_notes = Column(Text, nullable=True)
     notes = Column(Text, nullable=True)
-    
+
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    category_rel = relationship("Category", back_populates="equipment_items")
+    rental_items = relationship("RentalItem", back_populates="equipment_item")
+    service_records = relationship("ServiceRecord", back_populates="equipment_item", order_by="ServiceRecord.service_start.desc()")
 
     def __repr__(self) -> str:
         return f"<EquipmentItem(id={self.id}, inv={self.inventory_number}, name='{self.name}', status={self.status})>"

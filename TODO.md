@@ -72,15 +72,15 @@
 ## 🚀 FÁZE 2: Rozšíření na 5 entit a vazbu M:N (Plný datový model)
 *Spustí se po zpětné vazbě klienta k demu.*
 
-- [ ] Entita `Category` (Lyže, Snowboardy, Boty, Hole, Lodě, Vesty + cenové tarify)
-- [ ] Entita `Customer` (Jméno, telefon, číslo dokladu, poznámka)
-- [ ] Entita `Rental` (Hlavička výpůjčky: zákazník, datum od, datum do, sjednaná cena, kauce, stav)
-- [ ] Entita `RentalItem` (**Vazba M:N**: Výpůjčka $\leftrightarrow$ Kus vybavení, datum vrácení, penále, stav kusu)
-- [ ] Entita `ServiceRecord` (Historie servisu: kus, datum od-do, popis zásahu, cena)
-- [ ] Byznys pravidlo: Kus nesmí být ve dvou překrývajících se výpůjčkách/rezervacích
-- [ ] Byznys pravidlo: Kus v servisu nelze půjčit
-- [ ] Byznys pravidlo: Výpočet penále za pozdní vrácení za každý započatý den
-- [ ] Byznys pravidlo: Historie výpůjček se nemaže
+- [x] Entita `Category` (Lyže, Snowboardy, Boty, Hole, Lodě, Vesty + cenové tarify)
+- [x] Entita `Customer` (Jméno, telefon, číslo dokladu, poznámka)
+- [x] Entita `Rental` (Hlavička výpůjčky: zákazník, datum od, datum do, sjednaná cena, kauce, stav)
+- [x] Entita `RentalItem` (**Vazba M:N**: Výpůjčka $\leftrightarrow$ Kus vybavení, datum vrácení, penále, stav kusu)
+- [x] Entita `ServiceRecord` (Historie servisu: kus, datum od-do, popis zásahu, cena)
+- [x] Byznys pravidlo: Kus nesmí být ve dvou překrývajících se výpůjčkách/rezervacích
+- [x] Byznys pravidlo: Kus v servisu nelze půjčit
+- [x] Byznys pravidlo: Výpočet penále za pozdní vrácení za každý započatý den
+- [x] Byznys pravidlo: Historie výpůjček se nemaže
 
 ---
 

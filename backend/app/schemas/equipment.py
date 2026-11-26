@@ -41,11 +41,13 @@ class EquipmentServiceAction(BaseModel):
     action: str = Field(..., description="SEND_TO_SERVICE nebo RETURN_FROM_SERVICE")
     service_notes: Optional[str] = Field(default=None, description="Popis závady či provedené údržby")
     new_condition: Optional[EquipmentCondition] = Field(default=None, description="Nový stav opotřebení po servisu")
+    cost: Optional[float] = Field(default=0.0, ge=0.0, description="Náklady na servisní zásah v Kč")
 
 
 class EquipmentItemResponse(EquipmentItemBase):
     id: int
     inventory_number: str
+    category_id: Optional[int] = None
     status: EquipmentStatus
     service_notes: Optional[str] = None
     created_at: datetime
