@@ -18,9 +18,9 @@ Aplikace musí splňovat následující kritéria definovaná zadáním:
   - *Aplikační / Byznys vrstva* (`EquipmentService`, validace unikátnosti kódů, stavový automat, servisní pravidla)
   - *Datová / Infrastrukturní vrstva* (SQLAlchemy ORM, `EquipmentRepository`, Alembic migrace, PostgreSQL v Dockeru / SQLite)
   - Závislosti striktně jednosměrné (Prezentace $\rightarrow$ Byznys $\rightarrow$ Data).
-- [x] **Relační databáze v Dockeru s migracemi:** Schéma verze řízeno striktně migračními skripty Alembic (`001_initial_equipment.py`, `002_phase2_full_model.py`).
+- [x] **Relační databáze v Dockeru s migracemi:** Schéma verze řízeno striktně migračními skripty Alembic (`001_initial_equipment.py`, `002_phase2_full_model.py`, `003_phase3_weekend_tariff.py`).
 - [x] **Datový model:** Plný 6-entitní model (`Category`, `EquipmentItem`, `Customer`, `Rental`, `RentalItem` – vazba M:N, `ServiceRecord`).
-- [x] **Automatizované testy:** Pytest testy byznys pravidel, stavových přechodů, blokace překryvů, výpočtu penále a REST API integrační testy (12 testů, 100% úspěšnost).
+- [x] **Automatizované testy:** Pytest testy byznys pravidel, stavových přechodů, blokace překryvů, výpočtu penále, víkendového tarifu, reportingu a REST API integrační testy (14 testů, 100% úspěšnost).
 - [x] **Spuštění jedním příkazem:** Kompletní stack (databáze + backend + frontend) spustitelný přes `docker compose up --build`.
 - [x] **Syntetická data:** Bezpečná syntetická testovací data (18 reálných položek půjčovny – lyže, snowboardy, kanoe, rafty, vesty) s automatickým seedem.
 - [x] **Technická dokumentace:** Tento soubor (`README.md`) udržovaný jako aktuální zdroj pravdy (SSOT).
@@ -353,6 +353,14 @@ py -3.12 -m pytest
 ## 7. Deník vývoje (Changelog)
 
 - **2026-11-26:**
+  - **FÁZE 3 – Reporting, víkendový tarif, částečné vrácení a tiskový protokol o výpůjčce:**
+    - **Víkendový tarif:** Implementována detekce víkendového tarifu (pátek od 12:00 do pondělí do 10:00 téhož víkendu = zvýhodněná sazba 2 dny místo 3), přidán sloupec `Rental.tariff_type` a Alembic migrace `003_phase3_weekend_tariff.py`.
+    - **Reporting API (`/api/v1/reports`):**
+      - `GET /api/v1/reports/active-overdue` – přehled aktuálně zapůjčených kusů, identifikace kusů po termínu vrácení a odhad průběžného penále.
+      - `GET /api/v1/reports/utilization` – statistika vytíženosti kategorií (obsazenost %, počty výpůjček, tržby) i jednotlivých kusů (vč. nákladů na servis) jako podklad pro dokupování.
+    - **Protokol o výpůjčce (`/api/v1/rentals/{id}/protocol`):** Generování předvyplněné smlouvy/protokolu s tiskovým náhledem (`RentalProtocolModal.tsx` + `@media print` styly pro čistý A4 tisk).
+    - **Frontend (Neo-Brutalismus):** Přidána záložka `05_REPORTING` (`ReportsView.tsx`), tlačítko pro rychlé nastavení víkendového tarifu, ukazatel částečného vrácení (`Vráceno X/Y ks`) a tlačítko `Protokol / Tisk`.
+    - **Testy:** Rozšířeno na 14 automatizovaných Pytest testů (100% úspěšnost) + čistý produkční Vite build.
   - **FÁZE 2 – Plný datový model (6 entit vč. vazby M:N) a klíčová byznys pravidla:**
     - **Datová vrstva & migrace:** Přidány SQLAlchemy modely `Category`, `Customer`, `Rental`, `RentalItem` (vazba M:N mezi výpůjčkou a kusem vybavení) a `ServiceRecord`, propojení `EquipmentItem.category_id` FK a Alembic migrace `002_phase2_full_model.py`.
     - **Byznys vrstva:** Implementovány služby `CategoryService`, `CustomerService`, `RentalService` a `ServiceRecordService`. Striktně vynucena pravidla: zákaz překrývajících se výpůjček/rezervací téhož kusu, zákaz půjčení kusu v servisu/vyřazeného, automatický výpočet penále za každý započatý den prodlení, podpora částečného vrácení (OB-4), fixace sjednané sazby (OB-5), nemazání historie výpůjček a automatické zakládání/uzavírání `ServiceRecord` (OB-3).

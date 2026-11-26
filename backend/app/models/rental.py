@@ -25,6 +25,7 @@ class Rental(Base):
     total_deposit = Column(Float, nullable=False, default=0.0)
     discount_amount = Column(Float, nullable=False, default=0.0)
     total_price = Column(Float, nullable=False, default=0.0)
+    tariff_type = Column(String(30), nullable=False, default="STANDARD")
     status = Column(SQLEnum(RentalStatus, native_enum=False), nullable=False, default=RentalStatus.ACTIVE, index=True)
     notes = Column(Text, nullable=True)
 

@@ -17,8 +17,11 @@ import {
   Rental,
   RentalCreate,
   ReturnItemPayload,
+  ActiveOverdueSummary,
+  UtilizationReport,
+  RentalProtocol,
 } from './types/phase2';
-import { equipmentApi, categoriesApi, customersApi, rentalsApi } from './services/api';
+import { equipmentApi, categoriesApi, customersApi, rentalsApi, reportsApi } from './services/api';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { EquipmentTable } from './components/EquipmentTable';
@@ -28,6 +31,8 @@ import { ConfirmModal } from './components/ConfirmModal';
 import { RentalsView } from './components/RentalsView';
 import { CustomersView } from './components/CustomersView';
 import { CategoriesView } from './components/CategoriesView';
+import { ReportsView } from './components/ReportsView';
+import { RentalProtocolModal } from './components/RentalProtocolModal';
 import { CheckIcon, InfoIcon, AlertIcon } from './components/Icons';
 
 interface Toast {
@@ -45,6 +50,9 @@ export const App: React.FC = () => {
   const [rentals, setRentals] = useState<Rental[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [activeOverdue, setActiveOverdue] = useState<ActiveOverdueSummary | null>(null);
+  const [utilization, setUtilization] = useState<UtilizationReport | null>(null);
+  const [activeProtocol, setActiveProtocol] = useState<RentalProtocol | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Filtry pro vybavení
@@ -76,25 +84,37 @@ export const App: React.FC = () => {
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [fetchedStats, fetchedItems, fetchedAll, fetchedRentals, fetchedCustomers, fetchedCategories] =
-        await Promise.all([
-          equipmentApi.getStats(),
-          equipmentApi.list({
-            category: selectedCategory,
-            status: selectedStatus,
-            search: search.trim() || undefined,
-          }),
-          equipmentApi.list(),
-          rentalsApi.list(),
-          customersApi.list(),
-          categoriesApi.list(),
-        ]);
+      const [
+        fetchedStats,
+        fetchedItems,
+        fetchedAll,
+        fetchedRentals,
+        fetchedCustomers,
+        fetchedCategories,
+        fetchedActiveOverdue,
+        fetchedUtilization,
+      ] = await Promise.all([
+        equipmentApi.getStats(),
+        equipmentApi.list({
+          category: selectedCategory,
+          status: selectedStatus,
+          search: search.trim() || undefined,
+        }),
+        equipmentApi.list(),
+        rentalsApi.list(),
+        customersApi.list(),
+        categoriesApi.list(),
+        reportsApi.getActiveOverdue(),
+        reportsApi.getUtilization(),
+      ]);
       setStats(fetchedStats);
       setItems(fetchedItems);
       setAllItems(fetchedAll);
       setRentals(fetchedRentals);
       setCustomers(fetchedCustomers);
       setCategories(fetchedCategories);
+      setActiveOverdue(fetchedActiveOverdue);
+      setUtilization(fetchedUtilization);
     } catch (err: any) {
       addToast('error', `Chyba při načítání dat: ${err.message}`);
     } finally {
@@ -210,6 +230,15 @@ export const App: React.FC = () => {
     await loadData();
   };
 
+  const handleOpenProtocol = async (rentalId: number) => {
+    try {
+      const protocol = await rentalsApi.getProtocol(rentalId);
+      setActiveProtocol(protocol);
+    } catch (err: any) {
+      addToast('error', `Nepodařilo se načíst protokol: ${err.message}`);
+    }
+  };
+
   const handleResetFilters = () => {
     setSearch('');
     setSelectedCategory(undefined);
@@ -265,6 +294,7 @@ export const App: React.FC = () => {
             onActivateReservation={handleActivateReservation}
             onCancelRental={handleCancelRental}
             onReturnItem={handleReturnItem}
+            onOpenProtocol={handleOpenProtocol}
           />
         </main>
       )}
@@ -286,6 +316,21 @@ export const App: React.FC = () => {
           />
         </main>
       )}
+
+      {activeTab === 'reports' && (
+        <main className="dispatch-desk" style={{ gridTemplateColumns: '1fr' }}>
+          <ReportsView
+            activeOverdue={activeOverdue}
+            utilization={utilization}
+            onOpenProtocol={handleOpenProtocol}
+          />
+        </main>
+      )}
+
+      <RentalProtocolModal
+        protocol={activeProtocol}
+        onClose={() => setActiveProtocol(null)}
+      />
 
       {/* Modální okna */}
       <EquipmentModal

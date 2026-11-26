@@ -17,6 +17,9 @@ import {
   RentalStatus,
   ReturnItemPayload,
   ServiceRecord,
+  ActiveOverdueSummary,
+  UtilizationReport,
+  RentalProtocol,
 } from '../types/phase2';
 
 const API_BASE = '/api/v1';
@@ -162,6 +165,21 @@ export const rentalsApi = {
       body: JSON.stringify(payload),
     });
     return handleResponse<Rental>(res);
+  },
+  async getProtocol(rentalId: number): Promise<RentalProtocol> {
+    const res = await fetch(`${API_BASE}/rentals/${rentalId}/protocol`);
+    return handleResponse<RentalProtocol>(res);
+  },
+};
+
+export const reportsApi = {
+  async getActiveOverdue(): Promise<ActiveOverdueSummary> {
+    const res = await fetch(`${API_BASE}/reports/active-overdue`);
+    return handleResponse<ActiveOverdueSummary>(res);
+  },
+  async getUtilization(): Promise<UtilizationReport> {
+    const res = await fetch(`${API_BASE}/reports/utilization`);
+    return handleResponse<UtilizationReport>(res);
   },
 };
 

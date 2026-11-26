@@ -57,6 +57,7 @@ class RentalResponse(BaseModel):
     total_deposit: float
     discount_amount: float
     total_price: float
+    tariff_type: str = "STANDARD"
     status: RentalStatus
     notes: Optional[str] = None
     created_at: datetime

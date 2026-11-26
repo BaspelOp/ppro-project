@@ -15,6 +15,7 @@ const TABS: { id: ActiveTab; label: string }[] = [
   { id: 'rentals', label: '02_VÝPŮJČKY' },
   { id: 'customers', label: '03_ZÁKAZNÍCI' },
   { id: 'categories', label: '04_CENÍK' },
+  { id: 'reports', label: '05_REPORTING' },
 ];
 
 export const Header: React.FC<HeaderProps> = ({

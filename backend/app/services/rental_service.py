@@ -20,6 +20,22 @@ def _to_naive_utc(dt: datetime) -> datetime:
     return dt
 
 
+def calculate_billing_days(start_dt: datetime, end_dt: datetime) -> tuple[float, str]:
+    """
+    Výpočet účtovaných dnů včetně víkendového tarifu:
+    Páteční odpoledne (od 12:00) až pondělí ráno (do 10:00) téhož víkendu
+    se účtuje zvýhodněným víkendovým tarifem za 2 dny místo 3.
+    """
+    duration_seconds = (end_dt - start_dt).total_seconds()
+    is_friday_afternoon = start_dt.weekday() == 4 and start_dt.hour >= 12
+    is_monday_morning = end_dt.weekday() == 0 and end_dt.hour <= 10
+    if is_friday_afternoon and is_monday_morning and duration_seconds <= 72 * 3600:
+        return 2.0, "WEEKEND"
+
+    rental_days = float(max(1, math.ceil(duration_seconds / 86400.0)))
+    return rental_days, "STANDARD"
+
+
 class RentalService:
     def __init__(self, db: Session):
         self.db = db
@@ -111,9 +127,8 @@ class RentalService:
                 detail=f"Kus '{inv}' je v požadovaném termínu již rezervován nebo zapůjčen v jiné smlouvě (#{overlapping[0].rental_id}).",
             )
 
-        # 4. Výpočet ceny a kauce (OB-5: snapshot sazby do RentalItem)
-        duration_seconds = (end_dt - start_dt).total_seconds()
-        rental_days = max(1, math.ceil(duration_seconds / 86400.0))
+        # 4. Výpočet ceny a kauce (OB-5: snapshot sazby do RentalItem + víkendový tarif)
+        rental_days, tariff_type = calculate_billing_days(start_dt, end_dt)
 
         total_deposit = sum(eq.deposit for eq in items)
         gross_price = sum(eq.daily_rate * rental_days for eq in items)
@@ -128,6 +143,7 @@ class RentalService:
             total_deposit=total_deposit,
             discount_amount=rental_in.discount_amount,
             total_price=total_price,
+            tariff_type=tariff_type,
             status=rental_status,
             notes=rental_in.notes,
         )

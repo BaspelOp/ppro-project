@@ -85,11 +85,11 @@
 ---
 
 ## 📊 FÁZE 3: Reporting a doplňkové funkce
-- [ ] Dashboard: Přehled aktuálně zapůjčených kusů a prodlení s vrácením
-- [ ] Dashboard: Statistika vytíženosti vybavení (podklad pro dokupování)
-- [ ] Možnost částečného vrácení výpůjčky (např. vrácení lyží dříve než bot)
-- [ ] Víkendový tarif (páteční odpoledne až pondělí ráno)
-- [ ] Generování předvyplněného protokolu o výpůjčce (náhled / tisk)
+- [x] Dashboard: Přehled aktuálně zapůjčených kusů a prodlení s vrácením
+- [x] Dashboard: Statistika vytíženosti vybavení (podklad pro dokupování)
+- [x] Možnost částečného vrácení výpůjčky (např. vrácení lyží dříve než bot)
+- [x] Víkendový tarif (páteční odpoledne až pondělí ráno)
+- [x] Generování předvyplněného protokolu o výpůjčce (náhled / tisk)
 
 ---
 

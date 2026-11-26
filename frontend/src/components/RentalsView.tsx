@@ -16,6 +16,7 @@ interface RentalsViewProps {
   onActivateReservation: (id: number) => Promise<void>;
   onCancelRental: (id: number) => Promise<void>;
   onReturnItem: (rentalId: number, rentalItemId: number, payload: ReturnItemPayload) => Promise<void>;
+  onOpenProtocol: (rentalId: number) => void;
 }
 
 export const RentalsView: React.FC<RentalsViewProps> = ({
@@ -26,6 +27,7 @@ export const RentalsView: React.FC<RentalsViewProps> = ({
   onActivateReservation,
   onCancelRental,
   onReturnItem,
+  onOpenProtocol,
 }) => {
   const [showForm, setShowForm] = useState(false);
   const [customerId, setCustomerId] = useState<number>(customers[0]?.id ?? 0);
@@ -208,7 +210,7 @@ export const RentalsView: React.FC<RentalsViewProps> = ({
             </div>
           </div>
 
-          <div style={{ marginTop: '12px', display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <div style={{ marginTop: '12px', display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontFamily: 'var(--font-mono)', fontSize: '0.82rem' }}>
               <input
                 type="checkbox"
@@ -217,6 +219,26 @@ export const RentalsView: React.FC<RentalsViewProps> = ({
               />
               Rezervace předem (stav RESERVED – nevydává se ihned)
             </label>
+            <button
+              type="button"
+              className="tactile-btn"
+              style={{ padding: '4px 10px', fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}
+              onClick={() => {
+                const now = new Date();
+                const day = now.getDay();
+                const diffToFri = (5 - day + 7) % 7;
+                const fri = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToFri, 14, 0);
+                const mon = new Date(fri.getTime() + 67 * 3600 * 1000); // Po 09:00
+                const fmt = (d: Date) => {
+                  const pad = (n: number) => String(n).padStart(2, '0');
+                  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                };
+                setStartDate(fmt(fri));
+                setEndDate(fmt(mon));
+              }}
+            >
+              Nastavit Víkendový tarif (Pá 14:00 &rarr; Po 09:00 = 2 dny)
+            </button>
           </div>
 
           <div style={{ marginTop: '12px' }}>
@@ -338,6 +360,35 @@ export const RentalsView: React.FC<RentalsViewProps> = ({
                     >
                       {st.label}
                     </span>
+                    {rental.tariff_type === 'WEEKEND' && (
+                      <span
+                        style={{
+                          padding: '2px 8px',
+                          border: '1px solid #14532d',
+                          background: '#dcfce7',
+                          color: '#14532d',
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                        }}
+                      >
+                        VÍKENDOVÝ TARIF
+                      </span>
+                    )}
+                    {rental.items.length > 1 && (
+                      <span
+                        style={{
+                          padding: '2px 6px',
+                          border: '1px solid #57534e',
+                          background: '#f5f5f4',
+                          color: '#44403c',
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '0.7rem',
+                        }}
+                      >
+                        Vráceno {rental.items.filter((i) => i.returned_at).length}/{rental.items.length} ks
+                      </span>
+                    )}
                     {isOverdue && (
                       <span
                         style={{
@@ -375,7 +426,14 @@ export const RentalsView: React.FC<RentalsViewProps> = ({
                       Penále: +{totalPenalty.toFixed(0)} Kč
                     </div>
                   )}
-                  <div style={{ marginTop: '6px', display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                  <div style={{ marginTop: '6px', display: 'flex', gap: '6px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                    <button
+                      className="tactile-btn"
+                      style={{ padding: '4px 8px', fontSize: '0.74rem' }}
+                      onClick={() => onOpenProtocol(rental.id)}
+                    >
+                      Protokol / Tisk
+                    </button>
                     {rental.status === 'RESERVED' && (
                       <>
                         <button

@@ -5,7 +5,9 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.rental import RentalStatus
 from app.schemas.rental import RentalCreate, RentalResponse, ReturnItemRequest
+from app.schemas.report import RentalProtocolResponse
 from app.services.rental_service import RentalService
+from app.services.report_service import ReportService
 
 router = APIRouter()
 
@@ -63,3 +65,13 @@ def return_rental_item(
 ):
     service = RentalService(db)
     return service.return_item(rental_id, rental_item_id, return_data)
+
+
+@router.get(
+    "/{rental_id}/protocol",
+    response_model=RentalProtocolResponse,
+    summary="Vygenerovat předvyplněný protokol o výpůjčce pro náhled a tisk",
+)
+def get_rental_protocol(rental_id: int, db: Session = Depends(get_db)):
+    service = ReportService(db)
+    return service.get_rental_protocol(rental_id)
