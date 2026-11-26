@@ -23,7 +23,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
         }}
       >
         <h2 style={{ margin: 0, fontFamily: 'var(--font-mono)', fontSize: '1.1rem' }}>
-          REPORTING &amp; ANALYTIKA PROVOZU (FÁZE 3)
+          REPORTING &amp; ANALYTIKA PROVOZU
         </h2>
         <p style={{ margin: '4px 0 0', fontSize: '0.82rem', color: '#57534e' }}>
           Přehled aktuálně zapůjčených kusů, prodlení s vrácením a statistika vytíženosti pro plánování nákupů.

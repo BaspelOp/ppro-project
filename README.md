@@ -353,6 +353,8 @@ py -3.12 -m pytest
 ## 7. Deník vývoje (Changelog)
 
 - **2026-11-26:**
+  - **Reakce na zpětnou vazbu klienta (Vyčištění UI od technických/školních odkazů):**
+    - Odstraněny všechny interní odkazy na předmět a zadání z uživatelského rozhraní (`Standard PPRO / SSOT` panel v `Sidebar.tsx`, podtitul `PPRO Zadání D` v `Header.tsx`, technické značky `(M:N)`, `(FÁZE 3)` a `RentalItem / OB-5` v pohledech).
   - **FÁZE 3 – Reporting, víkendový tarif, částečné vrácení a tiskový protokol o výpůjčce:**
     - **Víkendový tarif:** Implementována detekce víkendového tarifu (pátek od 12:00 do pondělí do 10:00 téhož víkendu = zvýhodněná sazba 2 dny místo 3), přidán sloupec `Rental.tariff_type` a Alembic migrace `003_phase3_weekend_tariff.py`.
     - **Reporting API (`/api/v1/reports`):**

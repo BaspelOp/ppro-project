@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="brand-stamp">DEPOT_01</div>
           <div className="brand-meta">
             <h1>Hory a voda // Dispečink půjčovny</h1>
-            <p>PPRO Zadání D • Plný datový model (5 entit + vazba M:N)</p>
+            <p>Půjčovna lyží, snowboardů a vodáckého vybavení</p>
           </div>
         </div>
 

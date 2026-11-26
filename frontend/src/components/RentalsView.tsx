@@ -101,7 +101,7 @@ export const RentalsView: React.FC<RentalsViewProps> = ({
       >
         <div>
           <h2 style={{ margin: 0, fontFamily: 'var(--font-mono)', fontSize: '1.1rem' }}>
-            MANIFEST VÝPŮJČEK A REZERVACÍ (M:N) [{rentals.length}]
+            MANIFEST VÝPŮJČEK A REZERVACÍ [{rentals.length}]
           </h2>
           <p style={{ margin: '4px 0 0', fontSize: '0.82rem', color: '#57534e' }}>
             Blokace překryvů, ochrana servisních kusů, částečné vrácení a automatické penále za prodlení.

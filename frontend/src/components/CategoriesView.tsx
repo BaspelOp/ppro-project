@@ -41,7 +41,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
           KATEGORIE A VÝCHOZÍ CENOVÉ TARIFY [{categories.length}]
         </h2>
         <p style={{ margin: '4px 0 0', fontSize: '0.82rem', color: '#57534e' }}>
-          Změna ceníku neovlivní již uzavřené smlouvy (sazba je fixována v RentalItem dle OB-5).
+          Změna ceníku se vztahuje pouze na nově vzniklé smlouvy; u stávajících zůstává původní sazba.
         </p>
       </div>
 

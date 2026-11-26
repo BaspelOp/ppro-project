@@ -6,7 +6,7 @@ import {
   CATEGORY_LABELS,
   STATUS_LABELS,
 } from '../types/equipment';
-import { CategoryIcon, LayersIcon, InfoIcon } from './Icons';
+import { CategoryIcon, LayersIcon } from './Icons';
 
 interface SidebarProps {
   stats: EquipmentStats | null;
@@ -145,23 +145,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             );
           })}
-        </div>
-      </div>
-
-      {/* Panel 3: Technická poznámka dispečinku */}
-      <div className="rail-panel" id="panel-audit-notes">
-        <div className="rail-panel-header">
-          <span>Standard PPRO</span>
-          <span>SSOT</span>
-        </div>
-        <div className="rail-panel-body" style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: '#44403c', gap: '8px' }}>
-          <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
-            <InfoIcon size={14} color="#8c5836" />
-            <span>Třívrstvá architektura: REST UI &rarr; EquipmentService &rarr; PostgreSQL/SQLite.</span>
-          </div>
-          <div style={{ padding: '6px', background: 'var(--paper-muted)', border: '1px solid var(--ink)', fontSize: '0.7rem' }}>
-            Kusy v servisu systém blokuje proti výpůjčce. Historie položek se nemaže.
-          </div>
         </div>
       </div>
     </aside>
